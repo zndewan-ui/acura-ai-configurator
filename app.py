@@ -60,18 +60,20 @@ if st.session_state.app_state == "CHAT":
         st.write("### ANALYZING DRIVER DNA...")
         prompt = st.chat_input("Tell me... do you chase the redline or the horizon?")
         
+      prompt = st.chat_input("Tell me... do you chase the redline or the horizon?")
+        
         if prompt:
             with st.spinner("Processing..."):
                 res = model.generate_content(f"You are a high-energy Acura specialist. Based on '{prompt}', recommend the Integra Type S or MDX Type S. Be brief and punchy.")
                 st.write(f"**Specialist:** {res.text}")
-                # We tell the app we are ready to show the button
-                st.session_state.show_button = True
+                # This line "saves" the fact that we've chatted
+                st.session_state.ready = True
 
-        # This button is now OUTSIDE the if prompt block so it stays visible
-        if st.session_state.get("show_button"):
-            if st.button("ENTER THE GARAGE"):
-                st.session_state.app_state = "GARAGE"
-                st.rerun()
+    # This button is now OUTSIDE the 'if prompt' block so it doesn't disappear
+    if st.session_state.get("ready"):
+        if st.button("ENTER THE GARAGE"):
+            st.session_state.app_state = "GARAGE"
+            st.rerun()
 # --- 5. PHASE 2: THE NFS VISUALIZER ---
 else:
     st.title(f"PROJECT: {st.session_state.selected_car.upper()}")
@@ -105,6 +107,7 @@ else:
         # THE VISUALIZER: Updates image based on 'paint' selection
         img_url = CAR_ASSETS[st.session_state.selected_car][paint]
         st.image(img_url, use_container_width=True, caption=f"2026 {st.session_state.selected_car} // {paint}")
+
 
 
 
