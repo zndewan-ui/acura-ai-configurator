@@ -2,114 +2,92 @@ import streamlit as st
 import google.generativeai as genai
 import time
 
-# --- 1. THE SHOWROOM DESIGN (CSS) ---
+# --- 1. ACURA CANADA VISUAL ENGINE (CSS) ---
 st.set_page_config(page_title="Acura Precision Configurator", layout="wide")
 
 st.markdown("""
     <style>
     .stApp { background-color: #000000; color: #ffffff; }
-    h1, h2, h3 { text-transform: uppercase; letter-spacing: 2px; font-weight: 800 !important; }
+    h1, h2, h3 { text-transform: uppercase; letter-spacing: 2px; font-weight: 700 !important; }
     .stButton>button { 
         background-color: #E4002B; color: white; border-radius: 0px; border: none; 
-        font-weight: bold; padding: 10px; transition: 0.5s;
+        font-weight: bold; width: 100%; height: 3em; transition: 0.3s;
     }
-    .stButton>button:hover { background-color: #ffffff; color: #E4002B; transform: scale(1.02); }
-    .red-accent { height: 4px; background-color: #E4002B; margin-bottom: 25px; }
-    /* Garage Menu Styling */
-    .garage-card { 
-        background: #111; padding: 25px; border-left: 5px solid #E4002B;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
+    .stButton>button:hover { background-color: #ffffff; color: #E4002B; }
+    .red-line { height: 4px; background-color: #E4002B; margin: 10px 0 30px 0; }
+    .garage-panel { background: #111; padding: 20px; border-left: 5px solid #E4002B; }
     </style>
-    <div class="red-accent"></div>
     """, unsafe_allow_html=True)
 
-# --- 2. THE VISUALIZER DATABASE ---
-# These are mapped to official Acura design colors for the 2026 lineup
-CAR_ASSETS = {
-    "Integra Type S": {
-        "Apex Blue Pearl": "https://www.acura.ca/Content/AcuraCA/Models/Integra/2026/site-assets/hero/hero-desktop.jpg",
-        "Tiger Eye Pearl": "https://www.acura.com/-/media/Acura-Platform/Models/Integra/2024/Type-S/Overview/Hero/2024-Integra-Type-S-Hero-M.jpg",
-        "Championship White": "https://www.acura.ca/Content/AcuraCA/Static/images/models/integra/2026/top-view.png",
-        "Majestic Black": "https://www.acura.ca/Content/AcuraCA/Static/images/models/integra/2026/gallery/integra-1.jpg"
-    },
-    "MDX Type S": {
-        "Urban Gray Pearl": "https://www.acura.ca/Content/AcuraCA/Models/MDX/2026/site-assets/hero/hero-desktop.jpg",
-        "Performance Red Pearl": "https://www.acura.ca/Content/AcuraCA/Models/MDX/2026/site-assets/gallery/exterior/mdx-1.jpg",
-        "Majestic Black": "https://www.acura.ca/Content/AcuraCA/Models/MDX/2026/site-assets/gallery/exterior/mdx-2.jpg"
-    }
+# --- 2. CONFIGURATOR DATABASE ---
+ACURA_MODELS = {
+    "Integra Type S": {"hp": 320, "torque": 310, "colors": ["Apex Blue Pearl", "Tiger Eye Pearl", "Majestic Black", "Championship White"]},
+    "MDX Type S": {"hp": 355, "torque": 354, "colors": ["Urban Gray Pearl", "Performance Red Pearl", "Majestic Black"]}
 }
 
-# --- 3. LOGIC & AI SETUP ---
+# --- 3. SESSION STATE ---
 if "app_state" not in st.session_state:
     st.session_state.app_state = "CHAT"
 if "selected_car" not in st.session_state:
     st.session_state.selected_car = "Integra Type S"
+if "chat_complete" not in st.session_state:
+    st.session_state.chat_complete = False
 
+# Fix: Use a valid model name (1.5-flash)
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-# --- 3. LOGIC & AI SETUP ---
-# Fixed the model name to a version that exists
 model = genai.GenerativeModel('gemini-1.5-flash')
 
 # --- 4. PHASE 1: THE AI INTERVIEW ---
 if st.session_state.app_state == "CHAT":
-    st.image("https://www.acura.ca/Content/AcuraCA/Static/logo/acura_logo_white.png", width=150)
+    st.image("https://www.acura.ca/Content/AcuraCA/Static/logo/acura_logo_white.png", width=120)
     st.title("Precision Personality Sync")
+    st.markdown('<div class="red-line"></div>', unsafe_allow_html=True)
     
-    with st.container():
-        st.write("### ANALYZING DRIVER DNA...")
-        prompt = st.chat_input("Tell me... do you chase the redline or the horizon?")
-        
-      prompt = st.chat_input("Tell me... do you chase the redline or the horizon?")
-        
-        if prompt:
-            with st.spinner("Processing..."):
-                res = model.generate_content(f"You are a high-energy Acura specialist. Based on '{prompt}', recommend the Integra Type S or MDX Type S. Be brief and punchy.")
-                st.write(f"**Specialist:** {res.text}")
-                # This line "saves" the fact that we've chatted
-                st.session_state.ready = True
+    prompt = st.chat_input("Tell me... do you chase the redline or the horizon?")
+    
+    if prompt:
+        with st.spinner("Analyzing Driver DNA..."):
+            # Fix: Using valid model for content generation
+            res = model.generate_content(f"You are a high-energy Acura specialist. Based on '{prompt}', recommend the Integra Type S or MDX Type S. Be brief and punchy.")
+            st.write(f"### Specialist: {res.text}")
+            st.session_state.chat_complete = True
 
-    # This button is now OUTSIDE the 'if prompt' block so it doesn't disappear
-    if st.session_state.get("ready"):
+    # Fix: Button moved OUTSIDE the 'if prompt' block so it stays visible
+    if st.session_state.chat_complete:
+        st.write("---")
         if st.button("ENTER THE GARAGE"):
             st.session_state.app_state = "GARAGE"
             st.rerun()
-# --- 5. PHASE 2: THE NFS VISUALIZER ---
+
+# --- 5. PHASE 2: THE NFS GARAGE ---
 else:
     st.title(f"PROJECT: {st.session_state.selected_car.upper()}")
+    st.markdown('<div class="red-line"></div>', unsafe_allow_html=True)
     
-    # HUD Layout
     col_vis, col_ui = st.columns([2, 1])
     
     with col_ui:
-        st.markdown('<div class="garage-card">', unsafe_allow_html=True)
-        st.subheader("🛠️ EXTERIOR CONFIG")
+        st.markdown('<div class="garage-panel">', unsafe_allow_html=True)
+        st.subheader("🛠️ EXTERIOR")
         
-        # COLOR SELECTOR (This triggers the visualizer)
-        available_colors = list(CAR_ASSETS[st.session_state.selected_car].keys())
-        paint = st.pills("PAINT FINISH", available_colors, default=available_colors[0])
+        colors = ACURA_MODELS[st.session_state.selected_car]["colors"]
+        paint = st.pills("PAINT FINISH", colors, default=colors[0])
         
         st.markdown("---")
-        st.subheader("PERFORMANCE STATS")
-        st.metric("HORSEPOWER", "320 HP", "STAGE 1")
-        st.metric("0-100 KM/H", "5.1s", "EXCELLENT")
+        st.subheader("PERFORMANCE HUD")
+        st.metric("POWER", f"{ACURA_MODELS[st.session_state.selected_car]['hp']} HP")
+        st.metric("TORQUE", f"{ACURA_MODELS[st.session_state.selected_car]['torque']} LB-FT")
         
         if st.button("🔥 LOCK IN BUILD"):
             st.balloons()
-            st.success("BUILD SENT TO DEALERSHIP. ACCESS GRANTED.")
+            st.success("Build Secured. Welcome to the Family.")
         
-        if st.button("← RETURN TO SYNC"):
+        if st.button("← BACK TO SYNC"):
             st.session_state.app_state = "CHAT"
+            st.session_state.chat_complete = False
             st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
     with col_vis:
-        # THE VISUALIZER: Updates image based on 'paint' selection
-        img_url = CAR_ASSETS[st.session_state.selected_car][paint]
-        st.image(img_url, use_container_width=True, caption=f"2026 {st.session_state.selected_car} // {paint}")
-
-
-
-
-
-
+        # Visualizer placeholder matching the Acura aesthetic
+        st.image("https://www.acura.ca/Content/AcuraCA/Models/Integra/2026/site-assets/hero/hero-desktop.jpg", use_container_width=True)
