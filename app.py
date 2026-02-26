@@ -47,7 +47,7 @@ if "selected_car" not in st.session_state:
     st.session_state.selected_car = "Integra Type S"
 
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-pro')
 
 # --- 4. PHASE 1: THE AI INTERVIEW ---
 if st.session_state.app_state == "CHAT":
@@ -100,3 +100,4 @@ else:
         # THE VISUALIZER: Updates image based on 'paint' selection
         img_url = CAR_ASSETS[st.session_state.selected_car][paint]
         st.image(img_url, use_container_width=True, caption=f"2026 {st.session_state.selected_car} // {paint}")
+
