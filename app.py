@@ -35,7 +35,7 @@ if "chat_complete" not in st.session_state:
 
 # Fix: Use a valid model name (1.5-flash)
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-2.5-flash')
 
 # --- 4. PHASE 1: THE AI INTERVIEW ---
 if st.session_state.app_state == "CHAT":
@@ -91,3 +91,4 @@ else:
     with col_vis:
         # Visualizer placeholder matching the Acura aesthetic
         st.image("https://www.acura.ca/Content/AcuraCA/Models/Integra/2026/site-assets/hero/hero-desktop.jpg", use_container_width=True)
+
