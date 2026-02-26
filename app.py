@@ -23,37 +23,37 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. FULL 2026 ACURA LINEUP & PERSONALITIES ---
+# --- 2. 2026 ACURA LINEUP DATA ---
 ACURA_MODELS = {
     "Integra Type S": {
         "hp": 320, "torque": 310, 
-        "traits": "The Purist. You value visceral engagement and raw mechanical connection.",
-        "colors": ["Apex Blue Pearl", "Tiger Eye Pearl", "Championship White", "Solar Silver Metallic"]
+        "traits": "The Purist. You value visceral engagement, raw mechanical connection, and track-ready precision.",
+        "colors": ["Apex Blue Pearl", "Tiger Eye Pearl", "Championship White", "Platinum White Pearl"]
     },
     "Integra A-SPEC": {
         "hp": 200, "torque": 192, 
-        "traits": "The Athletic Agile. A sporty, tech-forward daily driver that pushes boundaries.",
-        "colors": ["Double Apex Blue Pearl", "Urban Grey Pearl", "Solar Silver Metallic"]
+        "traits": "The Athletic Agile. A sporty, tech-forward daily driver with a liftback design for any lifestyle.",
+        "colors": ["Double Apex Blue Pearl", "Urban Gray Pearl", "Majestic Black Pearl"]
     },
     "ADX Platinum": {
         "hp": 190, "torque": 179, 
-        "traits": "The Urban Adventurer. A premium, tech-focused SUV for an active city life.",
-        "colors": ["Adriatic Sea Blue Metallic", "Urban Gray Pearl", "Platinum White Pearl"]
+        "traits": "The Urban Adventurer. A premium, tech-focused compact SUV destined for life's adventures.",
+        "colors": ["Urban Gray Pearl", "Double Apex Blue Pearl II", "Milano Red"]
     },
     "TLX Type S": {
         "hp": 355, "torque": 354, 
-        "traits": "The Executive Athlete. Racetrack-inspired performance in a sophisticated sedan.",
+        "traits": "The Executive Athlete. Racetrack-inspired performance in a sophisticated luxury sedan.",
         "colors": ["Urban Gray Pearl", "Apex Blue Pearl", "Performance Red Pearl"]
     },
     "RDX A-Spec": {
         "hp": 272, "torque": 280, 
-        "traits": "The Balanced Versatile. Driven by adrenaline with all-weather confidence.",
+        "traits": "The Balanced Versatile. Adrenaline-seeking power meets premium utility and bold styling.",
         "colors": ["Berlina Black", "Apex Blue Pearl", "Performance Red Pearl"]
     },
     "MDX Type S Ultra": {
         "hp": 355, "torque": 354, 
-        "traits": "The Power Leader. A high-performing 7-seater at the absolute pinnacle.",
-        "colors": ["Double Apex Blue Pearl", "Urban Gray Pearl", "Majestic Black Pearl"]
+        "traits": "The Power Leader. A 7-passenger SUV that takes premium performance to the next level.",
+        "colors": ["Performance Red Pearl", "Urban Gray Pearl", "Majestic Black Pearl"]
     },
     "ZDX Type S": {
         "hp": 500, "torque": 544, 
@@ -68,24 +68,24 @@ if "selected_car" not in st.session_state: st.session_state.selected_car = "Inte
 if "chat_complete" not in st.session_state: st.session_state.chat_complete = False
 if "current_image" not in st.session_state: st.session_state.current_image = None
 
-# Paid API Client
+# Using Google GenAI SDK Client
 client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
 
-# --- UPDATED AI IMAGE ENGINE (With Random Seed Fix) ---
+# --- UPDATED AI IMAGE ENGINE (Prompt Noise Fix) ---
 def generate_ai_garage_render(car, color):
-    # Unique seed forces a new image on every click
-    seed = random.randint(1, 1000000)
+    # Unique number in prompt forces a new image without using 'seed' parameter
+    noise = random.randint(1, 1000000)
     prompt = (f"Professional 3D automotive render of a 2026 {car} in {color}, "
-              f"Need for Speed aesthetic, cinematic garage lighting, 8k resolution, ray-tracing. "
-              f"Seed identifier: {seed}.")
+              f"Need for Speed aesthetic, cinematic lighting, 8k resolution, ray-tracing. "
+              f"Variation ID: {noise}")
     
     response = client.models.generate_images(
         model="imagen-3.0-generate-002",
         prompt=prompt,
         config=types.GenerateImagesConfig(
             number_of_images=1, 
-            aspect_ratio="16:9",
-            seed=seed 
+            aspect_ratio="16:9"
+            # REMOVED: seed=seed (This fixes the 'ValueError')
         )
     )
     return Image.open(BytesIO(response.generated_images[0].image.image_bytes))
@@ -103,7 +103,7 @@ if st.session_state.app_state == "CHAT":
             personality_context = "\n".join([f"{k}: {v['traits']}" for k,v in ACURA_MODELS.items()])
             res = client.models.generate_content(
                 model="gemini-2.5-flash", 
-                contents=f"Recommend ONE car from: {personality_context} based on: {prompt}. Match the user's energy."
+                contents=f"Recommend ONE car from: {personality_context} based on: {prompt}. Be high energy."
             )
             st.write(f"### Specialist: {res.text}")
             for car in ACURA_MODELS.keys():
@@ -134,7 +134,7 @@ else:
         st.metric("TORQUE", f"{stats['torque']} LB-FT")
         
         if st.button("🚀 GENERATE NEW AI RENDER"):
-            with st.spinner("Rendering unique 3D model..."):
+            with st.spinner("Rendering unique 3D build..."):
                 st.session_state.current_image = generate_ai_garage_render(st.session_state.selected_car, paint)
         
         if st.button("🔄 RESET GARAGE"):
