@@ -1,6 +1,6 @@
 import streamlit as st
-from google import genai # Correct import for the new SDK
-from google.genai import types # Required for Imagen configuration
+from google import genai         # This requires 'google-genai' in requirements.txt
+from google.genai import types   # Needed for 3D image generation settings
 from PIL import Image
 from io import BytesIO
 import time
@@ -116,4 +116,5 @@ else:
             st.image(st.session_state.current_image, use_container_width=True)
         else:
             st.info("Click 'GENERATE AI 3D RENDER' to view your custom project build.")
+
 
