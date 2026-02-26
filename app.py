@@ -3,6 +3,7 @@ from google import genai
 from google.genai import types
 from PIL import Image
 from io import BytesIO
+import random 
 import time
 
 # --- 1. ACURA CANADA VISUAL ENGINE (CSS) ---
@@ -22,36 +23,41 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. 2026 ACURA LINEUP DATA ---
+# --- 2. FULL 2026 ACURA LINEUP & PERSONALITIES ---
 ACURA_MODELS = {
     "Integra Type S": {
         "hp": 320, "torque": 310, 
-        "traits": "The Purist. You value raw mechanical connection and track-ready performance.",
-        "colors": ["Apex Blue Pearl", "Tiger Eye Pearl", "Championship White"]
+        "traits": "The Purist. You value visceral engagement and raw mechanical connection.",
+        "colors": ["Apex Blue Pearl", "Tiger Eye Pearl", "Championship White", "Solar Silver Metallic"]
     },
-    "TLX Type S": {
-        "hp": 355, "torque": 354, 
-        "traits": "The Executive Athlete. You demand a sharp sport sedan with Turbo V6 and SH-AWD®.",
-        "colors": ["Urban Gray Pearl", "Apex Blue Pearl", "Performance Red Pearl"]
+    "Integra A-SPEC": {
+        "hp": 200, "torque": 192, 
+        "traits": "The Athletic Agile. A sporty, tech-forward daily driver that pushes boundaries.",
+        "colors": ["Double Apex Blue Pearl", "Urban Grey Pearl", "Solar Silver Metallic"]
     },
     "ADX Platinum": {
         "hp": 190, "torque": 179, 
-        "traits": "The Urban Adventurer. A tech-forward subcompact SUV for active city life.",
-        "colors": ["Urban Gray Pearl", "Double Apex Blue Pearl II", "Platinum White Pearl"]
+        "traits": "The Urban Adventurer. A premium, tech-focused SUV for an active city life.",
+        "colors": ["Adriatic Sea Blue Metallic", "Urban Gray Pearl", "Platinum White Pearl"]
+    },
+    "TLX Type S": {
+        "hp": 355, "torque": 354, 
+        "traits": "The Executive Athlete. Racetrack-inspired performance in a sophisticated sedan.",
+        "colors": ["Urban Gray Pearl", "Apex Blue Pearl", "Performance Red Pearl"]
     },
     "RDX A-Spec": {
         "hp": 272, "torque": 280, 
-        "traits": "The Balanced Versatile. Turbo VTEC® power meets premium crossover utility.",
+        "traits": "The Balanced Versatile. Driven by adrenaline with all-weather confidence.",
         "colors": ["Berlina Black", "Apex Blue Pearl", "Performance Red Pearl"]
     },
-    "MDX Type S": {
+    "MDX Type S Ultra": {
         "hp": 355, "torque": 354, 
-        "traits": "The Power Leader. A 7-passenger SUV that rules the road with predatory intent.",
-        "colors": ["Urban Gray Pearl", "Performance Red Pearl", "Majestic Black"]
+        "traits": "The Power Leader. A high-performing 7-seater at the absolute pinnacle.",
+        "colors": ["Double Apex Blue Pearl", "Urban Gray Pearl", "Majestic Black Pearl"]
     },
     "ZDX Type S": {
-        "hp": 499, "torque": 544, 
-        "traits": "The Future Specialist. Instant electric torque and ground-breaking technology.",
+        "hp": 500, "torque": 544, 
+        "traits": "The Future Specialist. Instant electric torque in the most powerful Acura SUV ever.",
         "colors": ["Double Apex Blue Pearl", "Urban Gray Pearl", "Majestic Black"]
     }
 }
@@ -62,16 +68,25 @@ if "selected_car" not in st.session_state: st.session_state.selected_car = "Inte
 if "chat_complete" not in st.session_state: st.session_state.chat_complete = False
 if "current_image" not in st.session_state: st.session_state.current_image = None
 
-# New Client Initialization for Gemini 2.5 Flash
+# Paid API Client
 client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
 
-# --- AI IMAGE ENGINE ---
+# --- UPDATED AI IMAGE ENGINE (With Random Seed Fix) ---
 def generate_ai_garage_render(car, color):
-    prompt = f"Professional 3D automotive render of a 2026 {car} in {color}, NFS aesthetic, cinematic lighting, 8k resolution."
+    # Unique seed forces a new image on every click
+    seed = random.randint(1, 1000000)
+    prompt = (f"Professional 3D automotive render of a 2026 {car} in {color}, "
+              f"Need for Speed aesthetic, cinematic garage lighting, 8k resolution, ray-tracing. "
+              f"Seed identifier: {seed}.")
+    
     response = client.models.generate_images(
         model="imagen-3.0-generate-002",
         prompt=prompt,
-        config=types.GenerateImagesConfig(number_of_images=1, aspect_ratio="16:9")
+        config=types.GenerateImagesConfig(
+            number_of_images=1, 
+            aspect_ratio="16:9",
+            seed=seed 
+        )
     )
     return Image.open(BytesIO(response.generated_images[0].image.image_bytes))
 
@@ -88,7 +103,7 @@ if st.session_state.app_state == "CHAT":
             personality_context = "\n".join([f"{k}: {v['traits']}" for k,v in ACURA_MODELS.items()])
             res = client.models.generate_content(
                 model="gemini-2.5-flash", 
-                contents=f"Recommend ONE car from: {personality_context} based on: {prompt}."
+                contents=f"Recommend ONE car from: {personality_context} based on: {prompt}. Match the user's energy."
             )
             st.write(f"### Specialist: {res.text}")
             for car in ACURA_MODELS.keys():
@@ -98,7 +113,7 @@ if st.session_state.app_state == "CHAT":
     if st.session_state.chat_complete:
         if st.button(f"ENTER GARAGE: {st.session_state.selected_car.upper()}"):
             st.session_state.app_state = "GARAGE"
-            st.rerun() # Trigger rerun to switch phases
+            st.rerun()
 
 # --- 5. PHASE 2: THE AI VISUALIZER GARAGE ---
 else:
@@ -118,10 +133,14 @@ else:
         st.metric("POWER", f"{stats['hp']} HP")
         st.metric("TORQUE", f"{stats['torque']} LB-FT")
         
-        if st.button("🚀 GENERATE AI RENDER"):
-            with st.spinner("Rendering..."):
+        if st.button("🚀 GENERATE NEW AI RENDER"):
+            with st.spinner("Rendering unique 3D model..."):
                 st.session_state.current_image = generate_ai_garage_render(st.session_state.selected_car, paint)
         
+        if st.button("🔄 RESET GARAGE"):
+            st.session_state.current_image = None
+            st.rerun()
+
         if st.button("← BACK"):
             st.session_state.app_state = "CHAT"
             st.session_state.chat_complete = False
@@ -133,4 +152,4 @@ else:
         if st.session_state.current_image:
             st.image(st.session_state.current_image, use_container_width=True)
         else:
-            st.info("Click 'GENERATE AI RENDER' to see your build.")
+            st.info("Click 'GENERATE NEW AI RENDER' to see your custom build.")
