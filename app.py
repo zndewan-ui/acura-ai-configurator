@@ -47,6 +47,8 @@ if "selected_car" not in st.session_state:
     st.session_state.selected_car = "Integra Type S"
 
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+# --- 3. LOGIC & AI SETUP ---
+# Fixed the model name to a version that exists
 model = genai.GenerativeModel('gemini-1.5-flash')
 
 # --- 4. PHASE 1: THE AI INTERVIEW ---
@@ -62,11 +64,14 @@ if st.session_state.app_state == "CHAT":
             with st.spinner("Processing..."):
                 res = model.generate_content(f"You are a high-energy Acura specialist. Based on '{prompt}', recommend the Integra Type S or MDX Type S. Be brief and punchy.")
                 st.write(f"**Specialist:** {res.text}")
-                
+                # We tell the app we are ready to show the button
+                st.session_state.show_button = True
+
+        # This button is now OUTSIDE the if prompt block so it stays visible
+        if st.session_state.get("show_button"):
             if st.button("ENTER THE GARAGE"):
                 st.session_state.app_state = "GARAGE"
                 st.rerun()
-
 # --- 5. PHASE 2: THE NFS VISUALIZER ---
 else:
     st.title(f"PROJECT: {st.session_state.selected_car.upper()}")
@@ -100,6 +105,7 @@ else:
         # THE VISUALIZER: Updates image based on 'paint' selection
         img_url = CAR_ASSETS[st.session_state.selected_car][paint]
         st.image(img_url, use_container_width=True, caption=f"2026 {st.session_state.selected_car} // {paint}")
+
 
 
 
