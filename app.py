@@ -132,7 +132,7 @@ Rules:
 
 def get_kai_response(messages):
     """Send conversation history to Gemini and get Kai's next reply."""
-    formatted = [{"role": m["role"], "parts": [{"text": m["content"]}]} for m in messages]
+    formatted = [{"role": "model" if m["role"] == "assistant" else "user", "parts": [{"text": m["content"]}]} for m in messages]
     response = client.models.generate_content(
         model="gemini-2.5-flash",
         contents=formatted,
