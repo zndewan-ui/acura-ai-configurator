@@ -141,28 +141,80 @@ def get_kai_response(messages):
     return response.text
 
 
-def generate_ai_render(car, color):
-    """Generate a car render using Gemini image generation."""
-    noise = random.randint(1, 1000000)
+
+ANGLES = [
+    ("front", "direct front view, headlights facing camera"),
+    ("front 3/4", "front three-quarter view from driver side"),
+    ("side profile", "pure side profile, perfectly level"),
+    ("rear 3/4", "rear three-quarter view from driver side"),
+    ("rear", "direct rear view, taillights facing camera"),
+    ("rear 3/4 passenger", "rear three-quarter view from passenger side"),
+    ("side profile passenger", "pure side profile from passenger side"),
+    ("front 3/4 passenger", "front three-quarter view from passenger side"),
+]
+
+def generate_angle(car, color, angle_name, angle_desc, seed):
+    """Generate a single angle render."""
     prompt = (
-        f"Professional 3D automotive render of a 2026 Acura {car} in {color} paint, "
-        f"cinematic studio lighting, dark garage background, NFS aesthetic, "
-        f"ultra-realistic, 8k resolution, ray-tracing reflections. Variation ID: {noise}"
+        f"Professional 3D automotive CGI render of a 2026 Acura {car} in {color} paint, "
+        f"{angle_desc}, pure black studio background, dramatic cinematic lighting, "
+        f"ultra-realistic, photorealistic, ray-tracing, 8k quality. "
+        f"No text, no people, no background scenery. Seed:{seed}"
     )
-    try:
-        response = client.models.generate_content(
-            model="gemini-2.5-flash-image",
-            contents=prompt,
-            config=types.GenerateContentConfig(response_modalities=["IMAGE", "TEXT"])
-        )
-        for part in response.candidates[0].content.parts:
-            if part.inline_data is not None:
-                return Image.open(BytesIO(part.inline_data.data))
-        st.error("No image was returned. Please try again.")
+    response = client.models.generate_content(
+        model="gemini-2.5-flash-image",
+        contents=prompt,
+        config=types.GenerateContentConfig(response_modalities=["IMAGE", "TEXT"])
+    )
+    for part in response.candidates[0].content.parts:
+        if part.inline_data is not None:
+            img = Image.open(BytesIO(part.inline_data.data))
+            return img.resize((960, 540), Image.LANCZOS)
+    return None
+
+def generate_spin_gif(car, color):
+    """Generate 8 angles and stitch into a looping turntable GIF."""
+    seed = random.randint(1, 999999)
+    frames = []
+    errors = []
+    progress = st.progress(0, text="Starting render...")
+
+    for i, (angle_name, angle_desc) in enumerate(ANGLES):
+        progress.progress(i / len(ANGLES), text=f"Rendering {angle_name} ({i+1}/{len(ANGLES)})...")
+        try:
+            frame = generate_angle(car, color, angle_name, angle_desc, seed)
+            if frame:
+                frames.append(frame)
+        except Exception as e:
+            errors.append(f"{angle_name}: {e}")
+
+    progress.progress(1.0, text="Stitching animation...")
+
+    if not frames:
+        st.error("No frames were generated. Please try again.")
+        progress.empty()
         return None
-    except Exception as e:
-        st.error(f"Image generation failed: {e}")
-        return None
+
+    if errors:
+        st.warning(f"{len(errors)} angle(s) failed, animating with {len(frames)} frames.")
+
+    # Forward + reverse for smooth ping-pong loop
+    loop_frames = frames + frames[-2:0:-1]
+
+    gif_buffer = BytesIO()
+    loop_frames[0].save(
+        gif_buffer,
+        format="GIF",
+        save_all=True,
+        append_images=loop_frames[1:],
+        duration=120,
+        loop=0,
+        optimize=False,
+    )
+    gif_buffer.seek(0)
+    progress.empty()
+    return gif_buffer.getvalue()
+
 
 
 # ============================================================
@@ -270,11 +322,11 @@ else:
         st.metric("POWER", f"{stats['hp']} HP")
         st.metric("TORQUE", f"{stats['torque']} LB-FT")
 
-        if st.button("🚀 GENERATE NEW AI RENDER"):
-            with st.spinner("Rendering your build..."):
-                st.session_state.current_image = generate_ai_render(
-                    st.session_state.selected_car, paint
-                )
+        if st.button("🎬 GENERATE 360° SPIN"):
+            st.session_state.current_image = None  # clear old
+            gif_bytes = generate_spin_gif(st.session_state.selected_car, paint)
+            if gif_bytes:
+                st.session_state.current_image = gif_bytes
 
         if st.button("← BACK TO CHAT"):
             for k, v in defaults.items():
@@ -285,6 +337,20 @@ else:
 
     with col_vis:
         if st.session_state.current_image:
-            st.image(st.session_state.current_image, use_container_width=True)
+            import base64
+            b64 = base64.b64encode(st.session_state.current_image).decode()
+            st.markdown(
+                f'<img src="data:image/gif;base64,{b64}" style="width:100%;border-radius:4px;">',
+                unsafe_allow_html=True
+            )
         else:
-            st.info("Click 'GENERATE NEW AI RENDER' to see your custom build.")
+            st.markdown("""
+            <div style="background:#111;border:1px solid #333;border-radius:4px;
+                        height:400px;display:flex;align-items:center;justify-content:center;
+                        flex-direction:column;gap:12px;">
+                <div style="font-size:3rem;">🚗</div>
+                <div style="color:#888;font-size:0.9rem;letter-spacing:1px;">
+                    CLICK GENERATE 360° SPIN TO ANIMATE YOUR BUILD
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
