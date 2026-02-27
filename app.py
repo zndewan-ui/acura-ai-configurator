@@ -184,23 +184,25 @@ st.markdown("""
     max-width: 92%;
 }
 
-/* Buttons — Acura Blue */
+/* Buttons — minimal flat to match stat cards */
 .stButton > button {
-    background: #0072bc !important;
-    color: #fff !important;
-    border: none !important;
-    border-radius: 50px !important;
-    font-weight: 700 !important;
-    font-size: 0.75rem !important;
+    background: transparent !important;
+    color: rgba(255,255,255,0.5) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 4px !important;
+    font-weight: 600 !important;
+    font-size: 0.65rem !important;
     letter-spacing: 2px !important;
     text-transform: uppercase !important;
     width: 100% !important;
-    height: 3em !important;
-    padding: 10px 40px !important;
+    height: 2.4em !important;
+    padding: 0 !important;
     transition: all 0.2s !important;
+    margin-top: 4px !important;
 }
 .stButton > button:hover {
-    background: #005a96 !important;
+    background: rgba(228,0,43,0.15) !important;
+    border-color: rgba(228,0,43,0.4) !important;
     color: #fff !important;
 }
 
@@ -258,30 +260,46 @@ video { border-radius: 8px; width: 100%; }
 [data-testid="stMetricLabel"] { color: rgba(255,255,255,0.4) !important; font-size: 0.65rem !important; letter-spacing: 2px !important; }
 [data-testid="stMetricValue"] { color: #fff !important; font-size: 1.4rem !important; }
 
-/* Pills — dark glass style, hide white background */
-[data-testid="stPillsContainer"] { background: transparent !important; gap: 8px !important; flex-wrap: wrap !important; }
-[data-testid="stPillsContainer"] > div { background: transparent !important; }
-button[data-testid="stPill"] {
-    background: rgba(255,255,255,0.06) !important;
-    border: 1px solid rgba(255,255,255,0.15) !important;
-    color: rgba(255,255,255,0.7) !important;
+/* Pills — nuclear override, kill all white */
+[data-testid="stPillsContainer"],
+[data-testid="stPillsContainer"] > div,
+[data-testid="stPillsContainer"] > div > div,
+.stPills, .stPills > div, .stPills > div > div {
+    background: transparent !important;
+    gap: 8px !important;
+}
+button[data-testid="stPill"],
+button[kind="pill"],
+.stPills button {
+    background: rgba(10,10,20,0.75) !important;
+    border: 1px solid rgba(255,255,255,0.2) !important;
+    color: #fff !important;
     border-radius: 20px !important;
     font-size: 0.75rem !important;
     letter-spacing: 0.5px !important;
-    padding: 6px 14px !important;
+    padding: 6px 16px !important;
     transition: all 0.2s !important;
     backdrop-filter: blur(10px) !important;
+    box-shadow: none !important;
 }
-button[data-testid="stPill"]:hover {
-    background: rgba(228,0,43,0.2) !important;
-    border-color: rgba(228,0,43,0.5) !important;
+button[data-testid="stPill"]:hover,
+.stPills button:hover {
+    background: rgba(228,0,43,0.25) !important;
+    border-color: rgba(228,0,43,0.6) !important;
     color: #fff !important;
 }
 button[data-testid="stPill"][aria-checked="true"],
 button[data-testid="stPill"][aria-pressed="true"],
-button[data-testid="stPill"].selected {
-    background: rgba(228,0,43,0.25) !important;
+button[data-testid="stPill"][data-active="true"],
+.stPills button[aria-pressed="true"] {
+    background: rgba(228,0,43,0.3) !important;
     border-color: #E4002B !important;
+    color: #fff !important;
+}
+/* Kill any span/p inside pills that may have white bg */
+button[data-testid="stPill"] *,
+.stPills button * {
+    background: transparent !important;
     color: #fff !important;
 }
 
@@ -507,7 +525,7 @@ def generate_luma_video(car, color):
 # ══════════════════════════════════════════════
 st.markdown("""
 <div class="top-nav">
-    <span class="nav-logo">⬡ &nbsp;ACURA</span>
+    <span class="nav-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Acura_logo.svg/120px-Acura_logo.svg.png" style="height:22px;vertical-align:middle;margin-right:10px;filter:brightness(0) invert(1);" /><span style="vertical-align:middle;">ACURA</span></span>
     <span class="nav-badge">Let's Build Your Dream Acura</span>
     <span class="nav-right">Precision Crafted Performance</span>
 </div>
@@ -586,14 +604,16 @@ if st.session_state.app_state == "CHAT":
 
         # Input / action buttons
         if st.session_state.chat_complete:
-            st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown('<div style="height:1px;background:rgba(255,255,255,0.06);margin:16px 0 12px;"></div><div style="font-size:0.6rem;letter-spacing:2px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:10px;">NEXT STEP</div>', unsafe_allow_html=True)
             c1, c2 = st.columns(2)
             with c1:
-                if st.button(f"🚗 ENTER GARAGE"):
+                st.markdown('<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:12px 16px;text-align:center;"><div style="font-size:1.1rem;">🚗</div><div style="font-size:0.55rem;letter-spacing:2px;color:#888;text-transform:uppercase;margin-top:4px;">Enter<br>Garage</div></div>', unsafe_allow_html=True)
+                if st.button("ENTER", key="enter_garage"):
                     st.session_state.app_state = "GARAGE"
                     st.rerun()
             with c2:
-                if st.button("↩ START OVER"):
+                st.markdown('<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:12px 16px;text-align:center;"><div style="font-size:1.1rem;">↩</div><div style="font-size:0.55rem;letter-spacing:2px;color:#888;text-transform:uppercase;margin-top:4px;">Start<br>Over</div></div>', unsafe_allow_html=True)
+                if st.button("RESTART", key="restart_chat"):
                     for k, v in defaults.items():
                         st.session_state[k] = v
                     st.rerun()
@@ -601,27 +621,47 @@ if st.session_state.app_state == "CHAT":
             user_input = st.chat_input("Reply to Kai...")
             if user_input:
                 st.session_state.messages.append({"role": "user", "content": user_input})
-                with st.spinner("Kai is typing..."):
-                    try:
-                        reply = get_kai_response(st.session_state.messages)
-                        is_done = "RECOMMENDATION_READY" in reply
-                        clean = reply.replace("RECOMMENDATION_READY", "").strip()
-                        st.session_state.messages.append({"role": "assistant", "content": clean})
-                        if is_done:
-                            for c in ACURA_MODELS:
-                                if c in clean:
-                                    st.session_state.selected_car = c
-                                    break
-                            for msg in st.session_state.messages:
-                                if msg["role"] == "user":
-                                    w = msg["content"].strip().split()[0]
-                                    if len(w) > 1 and w.isalpha():
-                                        st.session_state.user_name = w.capitalize()
+
+                # Check if user directly mentioned a specific car — skip the chat and go straight to garage
+                mentioned_car = None
+                for car_name in ACURA_MODELS:
+                    if car_name.lower() in user_input.lower():
+                        mentioned_car = car_name
+                        break
+
+                if mentioned_car:
+                    st.session_state.selected_car = mentioned_car
+                    # Try to grab their name from the conversation so far
+                    for msg in st.session_state.messages:
+                        if msg["role"] == "user":
+                            w = msg["content"].strip().split()[0]
+                            if len(w) > 1 and w.isalpha():
+                                st.session_state.user_name = w.capitalize()
+                                break
+                    st.session_state.app_state = "GARAGE"
+                    st.rerun()
+                else:
+                    with st.spinner("Kai is typing..."):
+                        try:
+                            reply = get_kai_response(st.session_state.messages)
+                            is_done = "RECOMMENDATION_READY" in reply
+                            clean = reply.replace("RECOMMENDATION_READY", "").strip()
+                            st.session_state.messages.append({"role": "assistant", "content": clean})
+                            if is_done:
+                                for c in ACURA_MODELS:
+                                    if c in clean:
+                                        st.session_state.selected_car = c
                                         break
-                            st.session_state.chat_complete = True
-                        st.rerun()
-                    except Exception as e:
-                        st.error(f"Error: {e}")
+                                for msg in st.session_state.messages:
+                                    if msg["role"] == "user":
+                                        w = msg["content"].strip().split()[0]
+                                        if len(w) > 1 and w.isalpha():
+                                            st.session_state.user_name = w.capitalize()
+                                            break
+                                st.session_state.chat_complete = True
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"Error: {e}")
 
 
 
@@ -679,20 +719,25 @@ else:
         </div>
         """, unsafe_allow_html=True)
 
-        st.markdown("<div style='height:4px;'></div>", unsafe_allow_html=True)
-        if st.button("🎬 GENERATE CINEMATIC REVEAL"):
-            st.session_state.video_url = None
-            with col_vis:
-                url = generate_luma_video(st.session_state.selected_car, paint)
-                if url:
-                    st.session_state.video_url = url
-                    st.rerun()
+        st.markdown('<div style="height:1px;background:rgba(255,255,255,0.06);margin:20px 0 16px;"></div><div style="font-size:0.6rem;letter-spacing:2px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:10px;">ACTIONS</div>', unsafe_allow_html=True)
 
-        st.markdown("<div style='height:8px;'></div>", unsafe_allow_html=True)
-        if st.button("← BACK TO CHAT"):
-            for k, v in defaults.items():
-                st.session_state[k] = v
-            st.rerun()
+        col_b1, col_b2 = st.columns(2)
+        with col_b1:
+            st.markdown('<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:12px 16px;text-align:center;"><div style="font-size:1.1rem;">🎬</div><div style="font-size:0.55rem;letter-spacing:2px;color:#888;text-transform:uppercase;margin-top:4px;">Cinematic<br>Reveal</div></div>', unsafe_allow_html=True)
+            if st.button("GENERATE", key="gen_btn"):
+                st.session_state.video_url = None
+                with col_vis:
+                    url = generate_luma_video(st.session_state.selected_car, paint)
+                    if url:
+                        st.session_state.video_url = url
+                        st.rerun()
+
+        with col_b2:
+            st.markdown('<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:12px 16px;text-align:center;"><div style="font-size:1.1rem;">←</div><div style="font-size:0.55rem;letter-spacing:2px;color:#888;text-transform:uppercase;margin-top:4px;">Back To<br>Chat</div></div>', unsafe_allow_html=True)
+            if st.button("BACK", key="back_btn"):
+                for k, v in defaults.items():
+                    st.session_state[k] = v
+                st.rerun()
 
         st.markdown("</div></div>", unsafe_allow_html=True)
 
