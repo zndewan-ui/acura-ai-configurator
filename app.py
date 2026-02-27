@@ -140,10 +140,10 @@ st.markdown("""
     border: 1px solid rgba(255,255,255,0.08);
     border-top: none;
     border-radius: 0 0 8px 8px;
-    padding: 16px 20px;
+    padding: 20px 28px;
     backdrop-filter: blur(24px);
-    min-height: 400px;
-    max-height: 55vh;
+    min-height: 420px;
+    max-height: 60vh;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: rgba(228,0,43,0.3) transparent;
@@ -461,42 +461,10 @@ if st.session_state.app_state == "CHAT":
                 st.error(f"Could not connect to Kai: {e}")
         st.stop()
 
-    # Two-column layout
-    col_car, col_chat = st.columns([3, 2], gap="large")
+    # Centred single-column chat
+    _, col_chat, _ = st.columns([1, 2, 1], gap="small")
 
-    # ── LEFT: Car display ──
-    with col_car:
-        car = st.session_state.selected_car
-        stats = ACURA_MODELS[car]
-
-        if st.session_state.preview_image_b64 and st.session_state.preview_car == car:
-            st.markdown(
-                f'<div class="car-float"><img src="data:image/png;base64,{st.session_state.preview_image_b64}" '
-                f'style="width:100%;border-radius:8px;filter:drop-shadow(0 20px 60px rgba(228,0,43,0.25));"/></div>',
-                unsafe_allow_html=True
-            )
-        else:
-            st.markdown("""
-            <div style="width:100%;height:360px;border:1px solid rgba(255,255,255,0.05);
-                border-radius:8px;display:flex;align-items:center;justify-content:center;
-                background:rgba(255,255,255,0.02);flex-direction:column;gap:12px;">
-                <div style="font-size:3rem;opacity:0.15;">⬡</div>
-                <div style="color:rgba(255,255,255,0.15);font-size:0.65rem;letter-spacing:3px;">GENERATING PREVIEW...</div>
-            </div>""", unsafe_allow_html=True)
-
-        # Car name + stats
-        st.markdown(f"""
-        <div class="car-label">
-            <div class="car-label-name">Acura {car}</div>
-            <div class="car-label-sub">2026 · Precision Crafted Performance</div>
-        </div>
-        <div class="stat-strip">
-            <div class="stat-pill"><div class="stat-val">{stats['hp']}</div><div class="stat-lbl">Horsepower</div></div>
-            <div class="stat-pill"><div class="stat-val">{stats['torque']}</div><div class="stat-lbl">LB-FT Torque</div></div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    # ── RIGHT: Chat panel ──
+    # ── CENTRE: Chat panel ──
     with col_chat:
         # Glass header
         st.markdown("""
@@ -573,16 +541,7 @@ if st.session_state.app_state == "CHAT":
                     except Exception as e:
                         st.error(f"Error: {e}")
 
-    # Generate preview image in background if not cached for current car
-    if st.session_state.preview_car != st.session_state.selected_car:
-        try:
-            b64 = generate_preview_image(st.session_state.selected_car)
-            if b64:
-                st.session_state.preview_image_b64 = b64
-                st.session_state.preview_car = st.session_state.selected_car
-                st.rerun()
-        except Exception:
-            pass
+
 
 
 # ══════════════════════════════════════════════
