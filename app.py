@@ -22,38 +22,53 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. 2026 ACURA LINEUP DATA ---
+# --- 2. 2026 ACURA CANADA FULL LINEUP DATA ---
 ACURA_MODELS = {
+    "Integra": {
+        "hp": 200, "torque": 192,
+        "traits": "The Daily Driver. A sporty hatchback-sedan with a VTEC Turbo engine and available 6-speed manual. The everyday Acura that never gets boring.",
+        "colors": ["Urban Gray Pearl", "Apex Blue Pearl", "Platinum White Pearl", "Sonic Gray Pearl", "Performance Red Pearl", "Majestic Black Pearl"]
+    },
     "Integra Type S": {
         "hp": 320, "torque": 310,
-        "traits": "The Purist. You value visceral engagement and raw mechanical connection.",
-        "colors": ["Apex Blue Pearl", "Tiger Eye Pearl", "Championship White", "Solar Silver Metallic"]
+        "traits": "The Purist. The most powerful Integra ever built. A close-ratio 6-speed manual, Brembo brakes, and 320HP — raw mechanical connection at its finest.",
+        "colors": ["Apex Blue Pearl", "Tiger Eye Pearl", "Championship White", "Solar Silver Metallic", "Gotham Gray Pearl"]
     },
-    "ADX Platinum": {
-        "hp": 190, "torque": 179,
-        "traits": "The Urban Adventurer. A premium, tech-focused compact SUV for active city life.",
-        "colors": ["Urban Gray Pearl", "Double Apex Blue Pearl II", "Platinum White Pearl"]
-    },
-    "MDX Type S Ultra": {
-        "hp": 355, "torque": 354,
-        "traits": "The Power Leader. A high-performing 7-seater at the absolute pinnacle.",
-        "colors": ["Performance Red Pearl", "Urban Gray Pearl", "Majestic Black Pearl"]
-    },
-    "RDX A-Spec": {
+    "TLX": {
         "hp": 272, "torque": 280,
-        "traits": "The Balanced Versatile. Turbo power meets premium utility and bold styling.",
-        "colors": ["Berlina Black", "Apex Blue Pearl", "Performance Red Pearl"]
+        "traits": "The Refined Performer. A luxury sports sedan with standard SH-AWD and a turbocharged engine. Precision meets premium every single day.",
+        "colors": ["Liquid Carbon Metallic", "Platinum White Pearl", "Majestic Black Pearl", "Apex Blue Pearl", "Performance Red Pearl"]
     },
     "TLX Type S": {
         "hp": 355, "torque": 354,
-        "traits": "The Executive Athlete. Racetrack-inspired performance in a sophisticated sedan.",
-        "colors": ["Urban Gray Pearl", "Apex Blue Pearl", "Majestic Black"]
+        "traits": "The Executive Athlete. Racetrack-inspired 3.0L Turbo V6, NSX-derived brakes, and Brembo calipers. The most powerful Acura sedan ever built.",
+        "colors": ["Urban Gray Pearl", "Apex Blue Pearl", "Majestic Black Pearl", "Liquid Carbon Metallic", "Performance Red Pearl"]
+    },
+    "ADX": {
+        "hp": 190, "torque": 179,
+        "traits": "The Urban Adventurer. A nimble, tech-loaded compact SUV built for city life and weekend escapes. Premium Bang & Olufsen sound included.",
+        "colors": ["Urban Gray Pearl", "Double Apex Blue Pearl II", "Platinum White Pearl", "Sonic Gray Pearl", "Majestic Black Pearl"]
+    },
+    "RDX A-Spec": {
+        "hp": 272, "torque": 280,
+        "traits": "The Balanced Versatile. Sport crossover with turbo power, SH-AWD torque vectoring, and bold A-Spec styling. Engineered to lead every day.",
+        "colors": ["Berlina Black", "Apex Blue Pearl", "Performance Red Pearl", "Liquid Carbon Metallic", "Platinum White Pearl"]
+    },
+    "MDX": {
+        "hp": 290, "torque": 267,
+        "traits": "The Family Commander. A 3-row V6 SUV with racecar-derived engine DNA, spacious premium cabin, and available SH-AWD for confident all-weather performance.",
+        "colors": ["Platinum White Pearl", "Urban Gray Pearl", "Majestic Black Pearl", "Performance Red Pearl", "Apex Blue Pearl"]
+    },
+    "MDX Type S": {
+        "hp": 355, "torque": 354,
+        "traits": "The Power Leader. A 7-seat SUV at the pinnacle of performance. 3.0L Turbo V6, adaptive air suspension, and quad exhaust — family hauler redefined.",
+        "colors": ["Performance Red Pearl", "Urban Gray Pearl", "Majestic Black Pearl", "Apex Blue Pearl", "Platinum White Pearl"]
     },
     "ZDX Type S": {
         "hp": 500, "torque": 544,
-        "traits": "The Future Specialist. Instant electric torque in the most powerful Acura SUV ever.",
-        "colors": ["Double Apex Blue Pearl", "Urban Gray Pearl", "Majestic Black"]
-    }
+        "traits": "The Electric Vanguard. Instant torque, zero emissions, 500HP. The most powerful Acura SUV ever built and a glimpse into the electrified future of the brand.",
+        "colors": ["Double Apex Blue Pearl", "Urban Gray Pearl", "Majestic Black Pearl", "Performance Red Pearl"]
+    },
 }
 
 # --- 3. SESSION STATE & CLIENT SETUP ---
