@@ -257,6 +257,52 @@ video { border-radius: 8px; width: 100%; }
 /* Metric labels */
 [data-testid="stMetricLabel"] { color: rgba(255,255,255,0.4) !important; font-size: 0.65rem !important; letter-spacing: 2px !important; }
 [data-testid="stMetricValue"] { color: #fff !important; font-size: 1.4rem !important; }
+
+/* Pills — dark glass style, hide white background */
+[data-testid="stPillsContainer"] { background: transparent !important; gap: 8px !important; flex-wrap: wrap !important; }
+[data-testid="stPillsContainer"] > div { background: transparent !important; }
+button[data-testid="stPill"] {
+    background: rgba(255,255,255,0.06) !important;
+    border: 1px solid rgba(255,255,255,0.15) !important;
+    color: rgba(255,255,255,0.7) !important;
+    border-radius: 20px !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.5px !important;
+    padding: 6px 14px !important;
+    transition: all 0.2s !important;
+    backdrop-filter: blur(10px) !important;
+}
+button[data-testid="stPill"]:hover {
+    background: rgba(228,0,43,0.2) !important;
+    border-color: rgba(228,0,43,0.5) !important;
+    color: #fff !important;
+}
+button[data-testid="stPill"][aria-checked="true"],
+button[data-testid="stPill"][aria-pressed="true"],
+button[data-testid="stPill"].selected {
+    background: rgba(228,0,43,0.25) !important;
+    border-color: #E4002B !important;
+    color: #fff !important;
+}
+
+/* Pills label */
+[data-testid="stPillsContainer"] + div label,
+.stPills label, [data-testid="stPills"] label {
+    color: rgba(255,255,255,0.4) !important;
+    font-size: 0.65rem !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase !important;
+}
+
+/* Garage glass panel — match chat panel style */
+.garage-glass {
+    background: rgba(4,4,12,0.88) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-top: 2px solid rgba(228,0,43,0.4) !important;
+    border-radius: 8px !important;
+    padding: 24px !important;
+    backdrop-filter: blur(24px) !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -596,15 +642,44 @@ else:
     col_vis, col_ui = st.columns([3, 1], gap="large")
 
     with col_ui:
-        st.markdown('<div class="garage-glass">', unsafe_allow_html=True)
+        st.markdown("""
+        <div style="background:rgba(4,4,12,0.88);border:1px solid rgba(255,255,255,0.1);
+                    border-top:2px solid rgba(228,0,43,0.4);border-radius:8px;overflow:hidden;
+                    backdrop-filter:blur(24px);">
+            <!-- Panel header -->
+            <div style="padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06);">
+                <div style="font-size:0.6rem;letter-spacing:3px;color:#E4002B;text-transform:uppercase;">
+                    <span style="display:inline-block;width:7px;height:7px;background:#E4002B;
+                    border-radius:50%;margin-right:6px;vertical-align:middle;"></span>
+                    CONFIGURE YOUR BUILD
+                </div>
+            </div>
+            <div style="padding:20px;">
+        """, unsafe_allow_html=True)
+
+        # Paint selector
+        st.markdown('<div style="font-size:0.6rem;letter-spacing:2px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:10px;">PAINT COLOUR</div>', unsafe_allow_html=True)
         colors = ACURA_MODELS[st.session_state.selected_car]["colors"]
-        paint = st.pills("PAINT", colors, default=colors[0])
-        st.markdown("<br>", unsafe_allow_html=True)
+        paint = st.pills("", colors, default=colors[0])
+
+        # Stats
         stats = ACURA_MODELS[st.session_state.selected_car]
-        ca, cb = st.columns(2)
-        with ca: st.metric("HP", stats['hp'])
-        with cb: st.metric("TQ", f"{stats['torque']}")
-        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown(f"""
+        <div style="display:flex;gap:12px;margin:20px 0;">
+            <div style="flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+                        border-radius:6px;padding:12px 16px;text-align:center;">
+                <div style="font-size:1.4rem;font-weight:700;color:#fff;">{stats['hp']}</div>
+                <div style="font-size:0.55rem;letter-spacing:2px;color:#888;text-transform:uppercase;margin-top:2px;">Horsepower</div>
+            </div>
+            <div style="flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+                        border-radius:6px;padding:12px 16px;text-align:center;">
+                <div style="font-size:1.4rem;font-weight:700;color:#fff;">{stats['torque']}</div>
+                <div style="font-size:0.55rem;letter-spacing:2px;color:#888;text-transform:uppercase;margin-top:2px;">LB-FT Torque</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown("<div style='height:4px;'></div>", unsafe_allow_html=True)
         if st.button("🎬 GENERATE CINEMATIC REVEAL"):
             st.session_state.video_url = None
             with col_vis:
@@ -612,12 +687,14 @@ else:
                 if url:
                     st.session_state.video_url = url
                     st.rerun()
-        st.markdown("<br>", unsafe_allow_html=True)
+
+        st.markdown("<div style='height:8px;'></div>", unsafe_allow_html=True)
         if st.button("← BACK TO CHAT"):
             for k, v in defaults.items():
                 st.session_state[k] = v
             st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown("</div></div>", unsafe_allow_html=True)
 
     with col_vis:
         if st.session_state.video_url:
