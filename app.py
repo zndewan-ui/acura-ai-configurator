@@ -76,6 +76,8 @@ if "app_state" not in st.session_state: st.session_state.app_state = "CHAT"
 if "selected_car" not in st.session_state: st.session_state.selected_car = "Integra Type S"
 if "chat_complete" not in st.session_state: st.session_state.chat_complete = False
 if "current_image" not in st.session_state: st.session_state.current_image = None
+if "user_name" not in st.session_state: st.session_state.user_name = ""
+if "recommendation_text" not in st.session_state: st.session_state.recommendation_text = ""
 
 client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
 
@@ -113,41 +115,94 @@ def generate_ai_render(car, color):
 # --- 4. PHASE 1: THE AI INTERVIEW ---
 if st.session_state.app_state == "CHAT":
     st.image("https://pngimg.com/uploads/acura/acura_PNG73.png", width=120)
-    st.title("Precision Personality Sync")
+    st.title("Let's Find Your Dream Acura")
     st.markdown('<div class="red-line"></div>', unsafe_allow_html=True)
 
-    prompt = st.chat_input("Do you chase the redline or the horizon?")
+    if not st.session_state.chat_complete:
+        st.markdown("#### Tell us a little about yourself and we'll match you with your perfect Acura.")
+        st.markdown("")
 
-    if prompt:
-        with st.spinner("Analyzing DNA..."):
-            context = "\n".join([f"{k}: {v['traits']}" for k, v in ACURA_MODELS.items()])
-            try:
-                res = client.models.generate_content(
-                    model="gemini-2.5-flash",
-                    contents=(
-                        f"You are an Acura performance specialist. "
-                        f"Recommend exactly ONE Acura model from this list: {context} "
-                        f"based on the customer's response: '{prompt}'. "
-                        f"Be high energy, bold, and mention the model name clearly."
-                    )
-                )
-                st.write(f"### Specialist: {res.text}")
-                for car in ACURA_MODELS.keys():
-                    if car in res.text:
-                        st.session_state.selected_car = car
-                        break
-                st.session_state.chat_complete = True
-            except Exception as e:
-                st.error(f"Chat error: {e}")
+        name = st.text_input("👤 First Name", placeholder="e.g. Alex")
 
-    if st.session_state.chat_complete:
-        if st.button(f"ENTER GARAGE: {st.session_state.selected_car.upper()}"):
+        lifestyle = st.selectbox("🌆 How would you describe your lifestyle?", [
+            "— Select —",
+            "Urban professional — city commutes, weekend trips",
+            "Family-focused — need space, safety, and comfort",
+            "Performance enthusiast — I drive for the feel of it",
+            "Adventure seeker — trails, road trips, outdoors",
+            "Eco-conscious — sustainability matters to me",
+        ])
+
+        priorities = st.multiselect("🏁 What matters most to you in a vehicle? (pick up to 3)", [
+            "Raw performance & horsepower",
+            "Luxury & premium interior",
+            "Technology & connectivity",
+            "Practicality & cargo space",
+            "Fuel efficiency / EV range",
+            "Bold, head-turning styling",
+            "All-weather capability",
+            "Driving engagement & manual control",
+        ], max_selections=3)
+
+        personality = st.text_area(
+            "✍️ Describe yourself in a few words (optional)",
+            placeholder="e.g. I'm competitive, always on the go, love weekend track days but also need to seat 5..."
+        )
+
+        st.markdown("")
+        if st.button("🔍 FIND MY ACURA"):
+            if not name:
+                st.warning("Please enter your first name to continue.")
+            elif lifestyle == "— Select —":
+                st.warning("Please select a lifestyle option.")
+            elif not priorities:
+                st.warning("Please select at least one priority.")
+            else:
+                st.session_state.user_name = name
+                with st.spinner(f"Analyzing your profile, {name}..."):
+                    context = "\n".join([f"{k}: {v['traits']}" for k, v in ACURA_MODELS.items()])
+                    priority_str = ", ".join(priorities)
+                    extra = f" They also said: '{personality}'" if personality.strip() else ""
+                    try:
+                        res = client.models.generate_content(
+                            model="gemini-2.5-flash",
+                            contents=(
+                                f"You are an enthusiastic Acura specialist at a premium dealership. "
+                                f"A customer named {name} is looking for their perfect Acura. "
+                                f"Their lifestyle: {lifestyle}. "
+                                f"Their priorities: {priority_str}.{extra} "
+                                f"Based on this profile, recommend exactly ONE Acura from this list: {context}. "
+                                f"Address {name} by name, be high-energy and bold, explain WHY this car fits their personality, "
+                                f"and mention the exact model name clearly."
+                            )
+                        )
+                        st.session_state.recommendation_text = res.text
+                        for car in ACURA_MODELS.keys():
+                            if car in res.text:
+                                st.session_state.selected_car = car
+                                break
+                        st.session_state.chat_complete = True
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Error: {e}")
+
+    else:
+        st.markdown(f"### 👋 Welcome, {st.session_state.user_name}!")
+        st.markdown('<div class="red-line"></div>', unsafe_allow_html=True)
+        st.info(st.session_state.recommendation_text)
+        st.markdown("")
+        if st.button(f"🚗 ENTER GARAGE: {st.session_state.selected_car.upper()}"):
             st.session_state.app_state = "GARAGE"
+            st.rerun()
+        if st.button("↩ START OVER"):
+            for key in ["chat_complete", "user_name", "recommendation_text", "current_image"]:
+                st.session_state[key] = "" if key in ["user_name", "recommendation_text"] else False if key == "chat_complete" else None
             st.rerun()
 
 # --- 5. PHASE 2: THE AI VISUALIZER GARAGE ---
 else:
-    st.title(f"PROJECT: {st.session_state.selected_car.upper()}")
+    name_display = f"{st.session_state.user_name.upper()}'S " if st.session_state.user_name else ""
+    st.title(f"{name_display}PROJECT: {st.session_state.selected_car.upper()}")
     st.markdown('<div class="red-line"></div>', unsafe_allow_html=True)
 
     col_vis, col_ui = st.columns([2, 1])
