@@ -24,13 +24,13 @@ st.markdown("""
         background: #1a1a1a; border-left: 3px solid #E4002B;
         padding: 12px 16px; border-radius: 0 12px 12px 0;
         margin: 8px 60px 8px 0; color: #fff;
-        font-size: 15px; line-height: 1.6;
+        font-size: 26px; line-height: 1.6;
     }
     .chat-ai {
         background: #111; border-left: 3px solid #555;
         padding: 12px 16px; border-radius: 0 12px 12px 0;
         margin: 8px 0 8px 60px; color: #fff;
-        font-size: 15px; line-height: 1.6;
+        font-size: 26px; line-height: 1.6;
     }
     .chat-label-ai { color: #E4002B; font-size: 0.72rem; font-weight: bold; margin-bottom: 4px; letter-spacing: 1px; }
     .chat-label-user { color: #666; font-size: 0.72rem; font-weight: bold; margin-bottom: 4px; letter-spacing: 1px; text-align: right; }
