@@ -177,7 +177,8 @@ if st.session_state.app_state == "CHAT":
     if not st.session_state.kai_started:
         with st.spinner(""):
             try:
-                opening = get_kai_response([])
+                seed = [{"role": "user", "content": "hi"}]
+                opening = get_kai_response(seed)
                 clean = opening.replace("RECOMMENDATION_READY", "").strip()
                 st.session_state.messages.append({"role": "assistant", "content": clean})
                 st.session_state.kai_started = True
