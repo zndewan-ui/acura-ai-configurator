@@ -1,4 +1,4 @@
-import streamlit as st
+  import streamlit as st
 from google import genai
 from google.genai import types
 from lumaai import LumaAI
@@ -21,13 +21,9 @@ st.markdown("""
 #MainMenu, footer, header { visibility: hidden; }
 .block-container { padding: 1rem 2rem 2rem 2rem !important; max-width: 100% !important; }
 
-/* Showroom background */
+/* Deep Dealership Background */
 .stApp {
-    background:
-        radial-gradient(ellipse at 15% 60%, rgba(20,25,60,0.95) 0%, transparent 55%),
-        radial-gradient(ellipse at 85% 20%, rgba(60,10,15,0.8) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 100%, rgba(228,0,43,0.08) 0%, transparent 40%),
-        linear-gradient(160deg, #060810 0%, #0c0f1e 40%, #080508 100%);
+    background: linear-gradient(180deg, #1a1d23 0%, #050608 100%);
     min-height: 100vh;
     color: #fff !important;
 }
@@ -38,7 +34,7 @@ st.markdown("""
     align-items: center;
     justify-content: space-between;
     padding: 10px 0 20px 0;
-    border-bottom: 1px solid rgba(228,0,43,0.25);
+    border-bottom: 1px solid rgba(0,114,188,0.25);
     margin-bottom: 24px;
 }
 .nav-logo {
@@ -49,9 +45,9 @@ st.markdown("""
     text-transform: uppercase;
 }
 .nav-badge {
-    background: rgba(228,0,43,0.15);
-    border: 1px solid rgba(228,0,43,0.5);
-    color: #E4002B;
+    background: rgba(0,114,188,0.15);
+    border: 1px solid rgba(0,114,188,0.5);
+    color: #0072bc;
     font-size: 0.65rem;
     font-weight: 600;
     letter-spacing: 3px;
@@ -114,14 +110,14 @@ st.markdown("""
 /* Glass chat panel */
 .chat-glass-header {
     background: rgba(8,8,18,0.75);
-    border: 1px solid rgba(228,0,43,0.2);
+    border: 1px solid rgba(0,114,188,0.25);
     border-radius: 8px 8px 0 0;
     padding: 14px 20px;
     border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 .chat-glass-body {
     background: rgba(8,8,18,0.6);
-    border: 1px solid rgba(228,0,43,0.15);
+    border: 1px solid rgba(0,114,188,0.15);
     border-top: none;
     border-radius: 0 0 8px 8px;
     padding: 16px 20px;
@@ -141,7 +137,7 @@ st.markdown("""
 @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
 .kai-dot {
     display: inline-block; width: 7px; height: 7px;
-    background: #E4002B; border-radius: 50%;
+    background: #0072bc; border-radius: 50%;
     margin-right: 5px;
     animation: pulse 2s ease-in-out infinite;
 }
@@ -157,8 +153,8 @@ st.markdown("""
     backdrop-filter: blur(10px);
 }
 .bubble-user {
-    background: rgba(228,0,43,0.12);
-    border: 1px solid rgba(228,0,43,0.28);
+    background: rgba(0,114,188,0.12);
+    border: 1px solid rgba(0,114,188,0.3);
     border-radius: 14px 3px 14px 14px;
     padding: 13px 17px;
     font-size: 16px;
@@ -167,40 +163,46 @@ st.markdown("""
     max-width: 92%;
 }
 
-/* Buttons */
+/* Buttons — Acura Blue */
 .stButton > button {
-    background: rgba(228,0,43,0.85) !important;
+    background: #0072bc !important;
     color: #fff !important;
     border: none !important;
-    border-radius: 2px !important;
-    font-weight: 600 !important;
+    border-radius: 50px !important;
+    font-weight: 700 !important;
     font-size: 0.75rem !important;
     letter-spacing: 2px !important;
     text-transform: uppercase !important;
     width: 100% !important;
     height: 3em !important;
+    padding: 10px 40px !important;
     transition: all 0.2s !important;
 }
 .stButton > button:hover {
-    background: #fff !important;
-    color: #E4002B !important;
+    background: #005a96 !important;
+    color: #fff !important;
 }
 
-/* Chat input */
+/* Chat input — glassmorphic pill */
 .stChatInput > div {
-    background: rgba(8,8,18,0.8) !important;
-    border: 1px solid rgba(228,0,43,0.25) !important;
-    border-radius: 4px !important;
+    background: rgba(0,0,0,0.4) !important;
+    backdrop-filter: blur(25px) !important;
+    -webkit-backdrop-filter: blur(25px) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 30px !important;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5) !important;
+    padding: 6px 16px !important;
 }
 .stChatInput textarea {
     color: #fff !important;
     font-size: 15px !important;
+    background: transparent !important;
 }
 
 /* Garage glass panel */
 .garage-glass {
     background: rgba(8,8,18,0.7);
-    border: 1px solid rgba(228,0,43,0.2);
+    border: 1px solid rgba(0,114,188,0.25);
     border-radius: 8px;
     padding: 24px;
     backdrop-filter: blur(20px);
