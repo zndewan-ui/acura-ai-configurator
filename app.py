@@ -525,7 +525,7 @@ def generate_luma_video(car, color):
 # ══════════════════════════════════════════════
 st.markdown("""
 <div class="top-nav">
-    <span class="nav-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Acura_logo.svg/120px-Acura_logo.svg.png" style="height:22px;vertical-align:middle;margin-right:10px;filter:brightness(0) invert(1);" /><span style="vertical-align:middle;">ACURA</span></span>
+    <span class="nav-logo"><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' style='height:28px;vertical-align:middle;margin-right:10px;'><path fill='white' d='M50 5 L5 95 L20 95 L50 35 L80 95 L95 95 Z M35 70 L65 70 L58 55 L50 38 L42 55 Z'/></svg><span style="vertical-align:middle;letter-spacing:5px;">ACURA</span></span>
     <span class="nav-badge">Let's Build Your Dream Acura</span>
     <span class="nav-right">Precision Crafted Performance</span>
 </div>
