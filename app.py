@@ -6,6 +6,7 @@ import random
 import time
 import requests
 import base64
+import streamlit.components.v1 as components
 
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="Acura AI Configurator", layout="wide", initial_sidebar_state="collapsed")
@@ -466,41 +467,53 @@ if st.session_state.app_state == "CHAT":
 
     # ── CENTRE: Chat panel ──
     with col_chat:
-        # Glass header
-        st.markdown("""
-        <div class="chat-glass-header">
-            <div style="font-size:0.6rem;letter-spacing:3px;color:#E4002B;text-transform:uppercase;margin-bottom:3px;">
-                <span class="kai-dot"></span>KAI — AI SPECIALIST
-            </div>
-            <div style="font-size:0.8rem;color:rgba(255,255,255,0.4);">Let's find your perfect Acura</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        # Build messages HTML
+        # Build messages HTML with fully inline styles (no external CSS classes needed)
         msgs_html = ""
         for msg in st.session_state.messages:
             if msg["role"] == "assistant":
                 msgs_html += f"""
-                <div class="msg-block-kai">
-                    <div class="msg-lbl"><span class="kai-dot"></span>KAI</div>
-                    <div class="bubble-kai">{msg['content']}</div>
+                <div style="margin:10px 0;display:flex;flex-direction:column;align-items:flex-start;gap:5px;">
+                    <div style="font-size:0.6rem;letter-spacing:2px;color:rgba(255,255,255,0.35);text-transform:uppercase;padding:0 3px;">
+                        <span style="display:inline-block;width:7px;height:7px;background:#E4002B;border-radius:50%;margin-right:5px;vertical-align:middle;"></span>KAI
+                    </div>
+                    <div style="background:rgba(4,4,12,0.85);border:1px solid rgba(255,255,255,0.09);border-radius:3px 14px 14px 14px;
+                                padding:14px 18px;font-size:16px;line-height:1.6;color:#fff;max-width:92%;
+                                backdrop-filter:blur(10px);font-family:Inter,sans-serif;">
+                        {msg['content']}
+                    </div>
                 </div>"""
             else:
                 msgs_html += f"""
-                <div class="msg-block-user">
-                    <div class="msg-lbl">YOU</div>
-                    <div class="bubble-user">{msg['content']}</div>
+                <div style="margin:10px 0;display:flex;flex-direction:column;align-items:flex-end;gap:5px;">
+                    <div style="font-size:0.6rem;letter-spacing:2px;color:rgba(255,255,255,0.35);text-transform:uppercase;padding:0 3px;">YOU</div>
+                    <div style="background:rgba(228,0,43,0.12);border:1px solid rgba(228,0,43,0.28);border-radius:14px 3px 14px 14px;
+                                padding:14px 18px;font-size:16px;line-height:1.6;color:#fff;max-width:92%;font-family:Inter,sans-serif;">
+                        {msg['content']}
+                    </div>
                 </div>"""
 
-        st.markdown(f"""
-        <div class="chat-glass-body" id="chat-end">
-            {msgs_html}
+        chat_html = f"""
+        <div style="background:rgba(4,4,12,0.88);border:1px solid rgba(255,255,255,0.1);border-radius:8px;overflow:hidden;font-family:Inter,sans-serif;">
+            <!-- Header -->
+            <div style="padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06);background:rgba(4,4,12,0.9);">
+                <div style="font-size:0.6rem;letter-spacing:3px;color:#E4002B;text-transform:uppercase;margin-bottom:3px;">
+                    <span style="display:inline-block;width:7px;height:7px;background:#E4002B;border-radius:50%;margin-right:6px;vertical-align:middle;"></span>
+                    KAI — AI SPECIALIST
+                </div>
+                <div style="font-size:0.8rem;color:rgba(255,255,255,0.4);">Let's find your perfect Acura</div>
+            </div>
+            <!-- Messages -->
+            <div id="chat-scroll" style="padding:16px 20px;min-height:380px;max-height:55vh;overflow-y:auto;
+                scrollbar-width:thin;scrollbar-color:rgba(228,0,43,0.3) transparent;">
+                {msgs_html}
+            </div>
         </div>
         <script>
-            const el = document.getElementById('chat-end');
+            const el = document.getElementById('chat-scroll');
             if(el) el.scrollTop = el.scrollHeight;
         </script>
-        """, unsafe_allow_html=True)
+        """
+        components.html(chat_html, height=520, scrolling=False)
 
         # Input / action buttons
         if st.session_state.chat_complete:
