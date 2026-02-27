@@ -206,18 +206,26 @@ st.markdown("""
 
 /* Chat input — glassmorphic pill */
 .stChatInput > div {
-    background: rgba(0,0,0,0.4) !important;
+    background: rgba(4,4,12,0.88) !important;
     backdrop-filter: blur(25px) !important;
     -webkit-backdrop-filter: blur(25px) !important;
     border: 1px solid rgba(255,255,255,0.1) !important;
-    border-radius: 30px !important;
+    border-top: 2px solid rgba(228,0,43,0.4) !important;
+    border-radius: 8px !important;
     box-shadow: 0 20px 50px rgba(0,0,0,0.5) !important;
     padding: 6px 16px !important;
 }
 .stChatInput textarea {
     color: #fff !important;
-    font-size: 15px !important;
+    font-size: 16px !important;
     background: transparent !important;
+    letter-spacing: 0.3px !important;
+}
+.stChatInput textarea::placeholder {
+    color: rgba(255,255,255,0.3) !important;
+    font-size: 16px !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
 }
 
 /* Garage glass panel */
@@ -439,7 +447,7 @@ def generate_luma_video(car, color):
 st.markdown("""
 <div class="top-nav">
     <span class="nav-logo">⬡ &nbsp;ACURA</span>
-    <span class="nav-badge">AI Configurator</span>
+    <span class="nav-badge">Let's Build Your Dream Acura</span>
     <span class="nav-right">Precision Crafted Performance</span>
 </div>
 """, unsafe_allow_html=True)
@@ -477,7 +485,7 @@ if st.session_state.app_state == "CHAT":
                         <span style="display:inline-block;width:7px;height:7px;background:#E4002B;border-radius:50%;margin-right:5px;vertical-align:middle;"></span>KAI
                     </div>
                     <div style="background:rgba(4,4,12,0.85);border:1px solid rgba(255,255,255,0.09);border-radius:3px 14px 14px 14px;
-                                padding:14px 18px;font-size:16px;line-height:1.6;color:#fff;max-width:92%;
+                                padding:14px 18px;font-size:25px;line-height:1.6;color:#fff;max-width:92%;
                                 backdrop-filter:blur(10px);font-family:Inter,sans-serif;">
                         {msg['content']}
                     </div>
@@ -487,7 +495,7 @@ if st.session_state.app_state == "CHAT":
                 <div style="margin:10px 0;display:flex;flex-direction:column;align-items:flex-end;gap:5px;">
                     <div style="font-size:0.6rem;letter-spacing:2px;color:rgba(255,255,255,0.35);text-transform:uppercase;padding:0 3px;">YOU</div>
                     <div style="background:rgba(228,0,43,0.12);border:1px solid rgba(228,0,43,0.28);border-radius:14px 3px 14px 14px;
-                                padding:14px 18px;font-size:16px;line-height:1.6;color:#fff;max-width:92%;font-family:Inter,sans-serif;">
+                                padding:14px 18px;font-size:25px;line-height:1.6;color:#fff;max-width:92%;font-family:Inter,sans-serif;">
                         {msg['content']}
                     </div>
                 </div>"""
