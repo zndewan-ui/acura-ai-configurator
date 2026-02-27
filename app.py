@@ -134,30 +134,87 @@ def get_kai_response(messages):
     return response.text
 
 
+def generate_still_image(car, color):
+    """Step 1: Generate a photorealistic still of the exact Acura using Gemini."""
+    prompt = (
+        f"Professional photorealistic automotive studio photograph of a 2026 Acura {car} "
+        f"in {color} paint. Front three-quarter view. Pure black studio background, "
+        f"dramatic cinematic lighting, ultra-realistic, sharp detail, 8k quality. "
+        f"No text, no people, no environment — just the car."
+    )
+    response = gemini_client.models.generate_content(
+        model="gemini-2.5-flash-image",
+        contents=prompt,
+        config=types.GenerateContentConfig(response_modalities=["IMAGE", "TEXT"])
+    )
+    for part in response.candidates[0].content.parts:
+        if part.inline_data is not None:
+            return part.inline_data.data, part.inline_data.mime_type
+    return None, None
+
+
+def upload_image_to_luma(image_bytes, mime_type):
+    """Upload image bytes to Luma as a generation asset and return the asset URL."""
+    upload = luma_client.generations.image.create(
+        image=("car.jpg", image_bytes, mime_type)
+    )
+    return upload.url
+
+
 def generate_luma_video(car, color):
     """
-    Uses Luma AI Dream Machine to generate a cinematic 360 turntable video
-    of the selected Acura in the chosen colour. Polls until complete.
+    Step 1: Generate a Gemini still image of the exact Acura.
+    Step 2: Feed that image into Luma AI as the first frame.
+    Step 3: Luma animates a cinematic 360° reveal from the real car image.
     """
-    prompt = (
-        f"Cinematic 360-degree turntable reveal of a 2026 Acura {car} in {color} paint. "
-        f"The car slowly rotates on a black reflective studio floor. "
-        f"Dramatic studio lighting with subtle rim lighting, ultra-realistic CGI, "
-        f"photorealistic paint reflections, luxury automotive advertisement quality. "
-        f"No people, no text, no background — just the car."
-    )
-
     status_text = st.empty()
     progress_bar = st.progress(0)
 
     try:
-        # Submit generation request
-        status_text.markdown("🎬 **Submitting to Luma AI...**")
+        # STEP 1 — Generate the reference still with Gemini
+        status_text.markdown("🖼️ **Step 1/2 — Generating reference image of your Acura...**")
+        progress_bar.progress(0.1)
+
+        image_bytes, mime_type = generate_still_image(car, color)
+        if not image_bytes:
+            st.error("Could not generate reference image. Please try again.")
+            status_text.empty(); progress_bar.empty()
+            return None
+
+        progress_bar.progress(0.25)
+        status_text.markdown("📤 **Uploading reference image to Luma AI...**")
+
+        # STEP 2 — Upload image and get URL for Luma
+        try:
+            image_url = upload_image_to_luma(image_bytes, mime_type or "image/jpeg")
+        except Exception:
+            # Fallback: use base64 data URI if upload API not available
+            import base64
+            b64 = base64.b64encode(image_bytes).decode()
+            image_url = f"data:{mime_type or 'image/jpeg'};base64,{b64}"
+
+        progress_bar.progress(0.35)
+        status_text.markdown("🎬 **Step 2/2 — Submitting to Luma AI for cinematic animation...**")
+
+        # STEP 3 — Submit to Luma with image as keyframe
+        video_prompt = (
+            f"Cinematic 360-degree turntable reveal of this exact 2026 Acura {car} in {color} paint. "
+            f"The car slowly rotates on a black reflective studio floor. "
+            f"Dramatic rim lighting, luxury automotive advertisement quality, smooth camera motion. "
+            f"Keep the exact car from the reference image."
+        )
+
         generation = luma_client.generations.create(
-            prompt=prompt,
-            model="ray-2",          # Luma's latest high-quality model
+            prompt=video_prompt,
+            model="ray-2",
             resolution="1080p",
             duration="5s",
+            keyframes={
+                "frame0": {
+                    "type": "image",
+                    "url": image_url,
+                }
+            }
         )
 
         gen_id = generation.id
@@ -166,11 +223,11 @@ def generate_luma_video(car, color):
         elapsed = 0
 
         status_messages = [
-            "🎨 Setting up your scene...",
+            "🎨 Composing your scene...",
             "💡 Placing studio lights...",
-            "🚗 Rendering your Acura...",
-            "✨ Adding paint reflections...",
-            "🎬 Finalising cinematic video...",
+            "🚗 Animating your exact Acura...",
+            "✨ Adding cinematic motion...",
+            "🎬 Finalising your reveal video...",
         ]
 
         while elapsed < max_wait:
