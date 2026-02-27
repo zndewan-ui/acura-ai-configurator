@@ -76,7 +76,7 @@ def generate_ai_render(car, color):
 
     try:
         response = client.models.generate_content(
-            model="gemini-2.0-flash-preview-image-generation",
+            model="gemini-2.5-flash-image",
             contents=prompt,
             config=types.GenerateContentConfig(
                 response_modalities=["IMAGE", "TEXT"]
@@ -97,7 +97,7 @@ def generate_ai_render(car, color):
 
 # --- 4. PHASE 1: THE AI INTERVIEW ---
 if st.session_state.app_state == "CHAT":
-    st.image("https://www.acura.ca/Content/AcuraCA/Static/logo/acura_logo_white.png", width=120)
+    st.image("https://pngimg.com/uploads/acura/acura_PNG73.png", width=120)
     st.title("Precision Personality Sync")
     st.markdown('<div class="red-line"></div>', unsafe_allow_html=True)
 
