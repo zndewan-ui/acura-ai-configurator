@@ -153,12 +153,21 @@ def generate_still_image(car, color):
     return None, None
 
 
-def upload_image_to_luma(image_bytes, mime_type):
-    """Upload image bytes to Luma as a generation asset and return the asset URL."""
-    upload = luma_client.generations.image.create(
-        image=("car.jpg", image_bytes, mime_type)
+def upload_image_to_imgbb(image_bytes):
+    """Upload image to ImgBB and return a public URL Luma can read."""
+    import base64
+    b64 = base64.b64encode(image_bytes).decode()
+    response = requests.post(
+        "https://api.imgbb.com/1/upload",
+        data={
+            "key": st.secrets["IMGBB_API_KEY"],
+            "image": b64,
+            "expiration": 600,  # auto-delete after 10 minutes
+        },
+        timeout=30
     )
-    return upload.url
+    response.raise_for_status()
+    return response.json()["data"]["url"]
 
 
 def generate_luma_video(car, color):
@@ -184,14 +193,9 @@ def generate_luma_video(car, color):
         progress_bar.progress(0.25)
         status_text.markdown("📤 **Uploading reference image to Luma AI...**")
 
-        # STEP 2 — Upload image and get URL for Luma
-        try:
-            image_url = upload_image_to_luma(image_bytes, mime_type or "image/jpeg")
-        except Exception:
-            # Fallback: use base64 data URI if upload API not available
-            import base64
-            b64 = base64.b64encode(image_bytes).decode()
-            image_url = f"data:{mime_type or 'image/jpeg'};base64,{b64}"
+        # STEP 2 — Upload image to ImgBB to get a public URL Luma can use
+        status_text.markdown("📤 **Uploading reference image...**")
+        image_url = upload_image_to_imgbb(image_bytes)
 
         progress_bar.progress(0.35)
         status_text.markdown("🎬 **Step 2/2 — Submitting to Luma AI for cinematic animation...**")
