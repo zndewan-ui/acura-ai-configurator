@@ -1,11 +1,12 @@
 import streamlit as st
 from google import genai
 from google.genai import types
-from PIL import Image
-from io import BytesIO
+from lumaai import LumaAI
 import random
+import time
+import requests
 
-# --- 1. ACURA BRAND STYLING (CSS) ---
+# --- 1. PAGE CONFIG & STYLING ---
 st.set_page_config(page_title="Acura Dream Finder", layout="wide")
 
 st.markdown("""
@@ -19,30 +20,21 @@ st.markdown("""
     .stButton>button:hover { background-color: #ffffff; color: #E4002B; }
     .red-line { height: 4px; background-color: #E4002B; margin: 10px 0 30px 0; }
     .garage-panel { background: #111; padding: 20px; border-left: 5px solid #E4002B; }
-
-    /* Chat bubble styling */
     .chat-user {
-        background: #1a1a1a;
-        border-left: 3px solid #E4002B;
-        padding: 12px 16px;
-        border-radius: 0 12px 12px 0;
-        margin: 8px 60px 8px 0;
-        color: #fff;
-        font-size: 0.95rem;
-        line-height: 1.5;
+        background: #1a1a1a; border-left: 3px solid #E4002B;
+        padding: 12px 16px; border-radius: 0 12px 12px 0;
+        margin: 8px 60px 8px 0; color: #fff;
+        font-size: 15px; line-height: 1.6;
     }
     .chat-ai {
-        background: #111;
-        border-left: 3px solid #555;
-        padding: 12px 16px;
-        border-radius: 0 12px 12px 0;
-        margin: 8px 0 8px 60px;
-        color: #fff;
-        font-size: 0.95rem;
-        line-height: 1.5;
+        background: #111; border-left: 3px solid #555;
+        padding: 12px 16px; border-radius: 0 12px 12px 0;
+        margin: 8px 0 8px 60px; color: #fff;
+        font-size: 15px; line-height: 1.6;
     }
     .chat-label-ai { color: #E4002B; font-size: 0.72rem; font-weight: bold; margin-bottom: 4px; letter-spacing: 1px; }
     .chat-label-user { color: #666; font-size: 0.72rem; font-weight: bold; margin-bottom: 4px; letter-spacing: 1px; text-align: right; }
+    video { border-radius: 6px; width: 100%; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -100,7 +92,7 @@ defaults = {
     "app_state": "CHAT",
     "selected_car": "Integra Type S",
     "chat_complete": False,
-    "current_image": None,
+    "video_url": None,
     "user_name": "",
     "messages": [],
     "kai_started": False,
@@ -109,15 +101,17 @@ for k, v in defaults.items():
     if k not in st.session_state:
         st.session_state[k] = v
 
-client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
+# --- 4. API CLIENTS ---
+gemini_client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
+luma_client = LumaAI(auth_token=st.secrets["LUMA_API_KEY"])
 
-# --- 4. KAI SYSTEM PROMPT ---
+# --- 5. KAI SYSTEM PROMPT ---
 SYSTEM_PROMPT = f"""You are Kai, a friendly and passionate Acura specialist. Your vibe is warm, casual, enthusiastic, and a little witty — like a car-obsessed friend who happens to know everything about Acura.
 
 Your job: have a fun, natural back-and-forth conversation to figure out which Acura is the perfect match for this person.
 
 Rules:
-- On your very first message (when the conversation is empty), introduce yourself as Kai and ask for their name in a warm, casual way. Keep it short.
+- On your very first message, introduce yourself as Kai and ask for their name in a warm, casual way. Keep it short.
 - Ask ONE question at a time. Never list multiple questions.
 - Keep messages short and punchy — like texting. 2-4 sentences max per message.
 - React naturally to what they say before your next question (e.g. "Oh nice!", "Okay I love that 👀", "That tells me a lot actually!").
@@ -131,9 +125,8 @@ Rules:
 
 
 def get_kai_response(messages):
-    """Send conversation history to Gemini and get Kai's next reply."""
     formatted = [{"role": "model" if m["role"] == "assistant" else "user", "parts": [{"text": m["content"]}]} for m in messages]
-    response = client.models.generate_content(
+    response = gemini_client.models.generate_content(
         model="gemini-2.5-flash",
         contents=formatted,
         config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT)
@@ -141,80 +134,80 @@ def get_kai_response(messages):
     return response.text
 
 
-
-ANGLES = [
-    ("front", "direct front view, headlights facing camera"),
-    ("front 3/4", "front three-quarter view from driver side"),
-    ("side profile", "pure side profile, perfectly level"),
-    ("rear 3/4", "rear three-quarter view from driver side"),
-    ("rear", "direct rear view, taillights facing camera"),
-    ("rear 3/4 passenger", "rear three-quarter view from passenger side"),
-    ("side profile passenger", "pure side profile from passenger side"),
-    ("front 3/4 passenger", "front three-quarter view from passenger side"),
-]
-
-def generate_angle(car, color, angle_name, angle_desc, seed):
-    """Generate a single angle render."""
+def generate_luma_video(car, color):
+    """
+    Uses Luma AI Dream Machine to generate a cinematic 360 turntable video
+    of the selected Acura in the chosen colour. Polls until complete.
+    """
     prompt = (
-        f"Professional 3D automotive CGI render of a 2026 Acura {car} in {color} paint, "
-        f"{angle_desc}, pure black studio background, dramatic cinematic lighting, "
-        f"ultra-realistic, photorealistic, ray-tracing, 8k quality. "
-        f"No text, no people, no background scenery. Seed:{seed}"
+        f"Cinematic 360-degree turntable reveal of a 2026 Acura {car} in {color} paint. "
+        f"The car slowly rotates on a black reflective studio floor. "
+        f"Dramatic studio lighting with subtle rim lighting, ultra-realistic CGI, "
+        f"photorealistic paint reflections, luxury automotive advertisement quality. "
+        f"No people, no text, no background — just the car."
     )
-    response = client.models.generate_content(
-        model="gemini-2.5-flash-image",
-        contents=prompt,
-        config=types.GenerateContentConfig(response_modalities=["IMAGE", "TEXT"])
-    )
-    for part in response.candidates[0].content.parts:
-        if part.inline_data is not None:
-            img = Image.open(BytesIO(part.inline_data.data))
-            return img.resize((960, 540), Image.LANCZOS)
-    return None
 
-def generate_spin_gif(car, color):
-    """Generate 8 angles and stitch into a looping turntable GIF."""
-    seed = random.randint(1, 999999)
-    frames = []
-    errors = []
-    progress = st.progress(0, text="Starting render...")
+    status_text = st.empty()
+    progress_bar = st.progress(0)
 
-    for i, (angle_name, angle_desc) in enumerate(ANGLES):
-        progress.progress(i / len(ANGLES), text=f"Rendering {angle_name} ({i+1}/{len(ANGLES)})...")
-        try:
-            frame = generate_angle(car, color, angle_name, angle_desc, seed)
-            if frame:
-                frames.append(frame)
-        except Exception as e:
-            errors.append(f"{angle_name}: {e}")
+    try:
+        # Submit generation request
+        status_text.markdown("🎬 **Submitting to Luma AI...**")
+        generation = luma_client.generations.create(
+            prompt=prompt,
+            model="ray-2",          # Luma's latest high-quality model
+            resolution="1080p",
+            duration="5s",
+        )
 
-    progress.progress(1.0, text="Stitching animation...")
+        gen_id = generation.id
+        max_wait = 300  # 5 minute timeout
+        poll_interval = 5
+        elapsed = 0
 
-    if not frames:
-        st.error("No frames were generated. Please try again.")
-        progress.empty()
+        status_messages = [
+            "🎨 Setting up your scene...",
+            "💡 Placing studio lights...",
+            "🚗 Rendering your Acura...",
+            "✨ Adding paint reflections...",
+            "🎬 Finalising cinematic video...",
+        ]
+
+        while elapsed < max_wait:
+            time.sleep(poll_interval)
+            elapsed += poll_interval
+
+            generation = luma_client.generations.get(id=gen_id)
+            state = generation.state
+
+            # Update progress bar and status
+            progress = min(elapsed / 90, 0.95)  # estimate ~90s typical
+            msg_index = min(int(progress * len(status_messages)), len(status_messages) - 1)
+            status_text.markdown(f"**{status_messages[msg_index]}** *(~{max(0, 90 - elapsed):.0f}s remaining)*")
+            progress_bar.progress(progress)
+
+            if state == "completed":
+                progress_bar.progress(1.0)
+                status_text.empty()
+                progress_bar.empty()
+                return generation.assets.video  # returns a URL string
+
+            elif state == "failed":
+                status_text.empty()
+                progress_bar.empty()
+                st.error(f"Luma generation failed: {getattr(generation, 'failure_reason', 'Unknown error')}")
+                return None
+
+        status_text.empty()
+        progress_bar.empty()
+        st.error("Generation timed out after 5 minutes. Please try again.")
         return None
 
-    if errors:
-        st.warning(f"{len(errors)} angle(s) failed, animating with {len(frames)} frames.")
-
-    # Forward + reverse for smooth ping-pong loop
-    loop_frames = frames + frames[-2:0:-1]
-
-    gif_buffer = BytesIO()
-    loop_frames[0].save(
-        gif_buffer,
-        format="GIF",
-        save_all=True,
-        append_images=loop_frames[1:],
-        duration=120,
-        loop=0,
-        optimize=False,
-    )
-    gif_buffer.seek(0)
-    progress.empty()
-    return gif_buffer.getvalue()
-
+    except Exception as e:
+        status_text.empty()
+        progress_bar.empty()
+        st.error(f"Luma AI error: {e}")
+        return None
 
 
 # ============================================================
@@ -225,7 +218,7 @@ if st.session_state.app_state == "CHAT":
     st.title("Let's Find Your Dream Acura")
     st.markdown('<div class="red-line"></div>', unsafe_allow_html=True)
 
-    # Kai sends the opening message automatically on first load
+    # Kai sends opening message automatically on first load
     if not st.session_state.kai_started:
         with st.spinner(""):
             try:
@@ -256,7 +249,6 @@ if st.session_state.app_state == "CHAT":
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # After recommendation: show Enter Garage + Start Over
     if st.session_state.chat_complete:
         st.markdown("---")
         col1, col2 = st.columns(2)
@@ -270,7 +262,6 @@ if st.session_state.app_state == "CHAT":
                     st.session_state[k] = v
                 st.rerun()
     else:
-        # Live chat input
         user_input = st.chat_input("Reply to Kai...")
         if user_input:
             st.session_state.messages.append({"role": "user", "content": user_input})
@@ -282,12 +273,10 @@ if st.session_state.app_state == "CHAT":
                     st.session_state.messages.append({"role": "assistant", "content": clean_reply})
 
                     if is_done:
-                        # Match the recommended car
                         for car in ACURA_MODELS.keys():
                             if car in clean_reply:
                                 st.session_state.selected_car = car
                                 break
-                        # Try to extract user's name from early messages
                         for msg in st.session_state.messages:
                             if msg["role"] == "user":
                                 first_word = msg["content"].strip().split()[0]
@@ -322,11 +311,17 @@ else:
         st.metric("POWER", f"{stats['hp']} HP")
         st.metric("TORQUE", f"{stats['torque']} LB-FT")
 
-        if st.button("🎬 GENERATE 360° SPIN"):
-            st.session_state.current_image = None  # clear old
-            gif_bytes = generate_spin_gif(st.session_state.selected_car, paint)
-            if gif_bytes:
-                st.session_state.current_image = gif_bytes
+        st.markdown("")
+
+        if st.button("🎬 GENERATE CINEMATIC REVEAL"):
+            st.session_state.video_url = None
+            with col_vis:
+                video_url = generate_luma_video(st.session_state.selected_car, paint)
+                if video_url:
+                    st.session_state.video_url = video_url
+                    st.rerun()
+
+        st.markdown("")
 
         if st.button("← BACK TO CHAT"):
             for k, v in defaults.items():
@@ -336,21 +331,24 @@ else:
         st.markdown('</div>', unsafe_allow_html=True)
 
     with col_vis:
-        if st.session_state.current_image:
-            import base64
-            b64 = base64.b64encode(st.session_state.current_image).decode()
-            st.markdown(
-                f'<img src="data:image/gif;base64,{b64}" style="width:100%;border-radius:4px;">',
-                unsafe_allow_html=True
-            )
+        if st.session_state.video_url:
+            # Download video bytes and play inline (Luma URLs expire, so we cache in session)
+            try:
+                video_bytes = requests.get(st.session_state.video_url, timeout=30).content
+                st.video(video_bytes, autoplay=True, loop=True, muted=True)
+            except Exception:
+                # Fallback: direct URL if download fails
+                st.video(st.session_state.video_url)
+            st.caption(f"2026 Acura {st.session_state.selected_car} · {paint} · Cinematic AI Reveal")
         else:
             st.markdown("""
-            <div style="background:#111;border:1px solid #333;border-radius:4px;
-                        height:400px;display:flex;align-items:center;justify-content:center;
-                        flex-direction:column;gap:12px;">
-                <div style="font-size:3rem;">🚗</div>
-                <div style="color:#888;font-size:0.9rem;letter-spacing:1px;">
-                    CLICK GENERATE 360° SPIN TO ANIMATE YOUR BUILD
+            <div style="background:#111;border:1px solid #222;border-radius:6px;
+                        height:420px;display:flex;align-items:center;justify-content:center;
+                        flex-direction:column;gap:16px;">
+                <div style="font-size:3.5rem;">🎬</div>
+                <div style="color:#888;font-size:0.85rem;letter-spacing:2px;text-align:center;padding:0 20px;">
+                    SELECT YOUR PAINT COLOUR<br>THEN CLICK GENERATE CINEMATIC REVEAL<br><br>
+                    <span style="color:#555;font-size:0.75rem;">Powered by Luma AI Dream Machine · ~60-90 seconds</span>
                 </div>
             </div>
             """, unsafe_allow_html=True)
