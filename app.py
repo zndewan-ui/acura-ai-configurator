@@ -1,4 +1,4 @@
-  import streamlit as st
+import streamlit as st
 from google import genai
 from google.genai import types
 from lumaai import LumaAI
@@ -623,3 +623,4 @@ else:
                     <span style="font-size:0.6rem;opacity:0.6;">Powered by Luma AI · ~90s</span>
                 </div>
             </div>""", unsafe_allow_html=True)
+
