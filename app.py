@@ -184,7 +184,7 @@ st.markdown("""
     max-width: 92%;
 }
 
-/* Buttons — minimal flat to match stat cards */
+/* Buttons — minimal flat */
 .stButton > button {
     background: transparent !important;
     color: rgba(255,255,255,0.5) !important;
@@ -319,6 +319,24 @@ div[data-testid="stPills"] button span {
     letter-spacing: 2px !important;
     text-transform: uppercase !important;
 }
+
+/* Selectbox dark styling */
+.stSelectbox > div > div {
+    background: rgba(10,10,22,0.85) !important;
+    border: 1px solid rgba(255,255,255,0.15) !important;
+    border-radius: 8px !important;
+    color: #fff !important;
+}
+.stSelectbox > div > div > div {
+    color: #fff !important;
+    -webkit-text-fill-color: #fff !important;
+}
+[data-testid="stSelectbox"] * { color: #fff !important; -webkit-text-fill-color: #fff !important; }
+[data-baseweb="select"] { background: rgba(10,10,22,0.85) !important; }
+[data-baseweb="select"] > div { background: rgba(10,10,22,0.85) !important; border-color: rgba(255,255,255,0.15) !important; }
+[data-baseweb="popover"] ul { background: rgba(10,10,22,0.97) !important; border: 1px solid rgba(255,255,255,0.1) !important; }
+[data-baseweb="popover"] li { color: #fff !important; }
+[data-baseweb="popover"] li:hover { background: rgba(228,0,43,0.2) !important; }
 
 /* Garage glass panel — match chat panel style */
 .garage-glass {
@@ -614,25 +632,20 @@ if st.session_state.app_state == "CHAT":
         # Input / action buttons
         if st.session_state.car_mentioned and not st.session_state.chat_complete:
             st.markdown('<div style="height:1px;background:rgba(255,255,255,0.06);margin:16px 0 12px;"></div>', unsafe_allow_html=True)
-            st.markdown(f'''<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:12px 16px;text-align:center;margin-bottom:4px;"><div style="font-size:1.1rem;">🚗</div><div style="font-size:0.55rem;letter-spacing:2px;color:#888;text-transform:uppercase;margin-top:4px;">Go to Garage · {st.session_state.selected_car}</div></div>''', unsafe_allow_html=True)
-            if st.button("GO TO GARAGE", key="car_mention_garage"):
+            if st.button("🚗  GO TO GARAGE", key="car_mention_garage"):
                 st.session_state.app_state = "GARAGE"
                 st.rerun()
 
         elif st.session_state.chat_complete:
-            st.markdown('<div style="height:1px;background:rgba(255,255,255,0.06);margin:16px 0 12px;"></div><div style="font-size:0.6rem;letter-spacing:2px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:10px;">NEXT STEP</div>', unsafe_allow_html=True)
-            c1, c2 = st.columns(2)
-            with c1:
-                st.markdown('<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:12px 16px;text-align:center;"><div style="font-size:1.1rem;">🚗</div><div style="font-size:0.55rem;letter-spacing:2px;color:#888;text-transform:uppercase;margin-top:4px;">Enter<br>Garage</div></div>', unsafe_allow_html=True)
-                if st.button("ENTER", key="enter_garage"):
-                    st.session_state.app_state = "GARAGE"
-                    st.rerun()
-            with c2:
-                st.markdown('<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:12px 16px;text-align:center;"><div style="font-size:1.1rem;">↩</div><div style="font-size:0.55rem;letter-spacing:2px;color:#888;text-transform:uppercase;margin-top:4px;">Start<br>Over</div></div>', unsafe_allow_html=True)
-                if st.button("RESTART", key="restart_chat"):
-                    for k, v in defaults.items():
-                        st.session_state[k] = v
-                    st.rerun()
+            st.markdown('<div style="height:1px;background:rgba(255,255,255,0.06);margin:16px 0 12px;"></div>', unsafe_allow_html=True)
+            if st.button("🚗  ENTER GARAGE", key="enter_garage"):
+                st.session_state.app_state = "GARAGE"
+                st.rerun()
+            st.markdown('<div style="height:8px;"></div>', unsafe_allow_html=True)
+            if st.button("↩  START OVER", key="restart_chat"):
+                for k, v in defaults.items():
+                    st.session_state[k] = v
+                st.rerun()
         else:
             user_input = st.chat_input("Reply to Kai...")
             if user_input:
@@ -713,10 +726,10 @@ else:
             <div style="padding:20px;">
         """, unsafe_allow_html=True)
 
-        # Paint selector
-        st.markdown('<div style="font-size:0.6rem;letter-spacing:2px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:10px;">PAINT COLOUR</div>', unsafe_allow_html=True)
+        # Paint selector — dark selectbox
         colors = ACURA_MODELS[st.session_state.selected_car]["colors"]
-        paint = st.pills("", colors, default=colors[0])
+        st.markdown('<div style="font-size:0.6rem;letter-spacing:2px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:6px;">PAINT COLOUR</div>', unsafe_allow_html=True)
+        paint = st.selectbox("", colors, index=0, key="paint_select", label_visibility="collapsed")
 
         # Stats
         stats = ACURA_MODELS[st.session_state.selected_car]
@@ -737,8 +750,7 @@ else:
 
         st.markdown('<div style="height:1px;background:rgba(255,255,255,0.06);margin:20px 0 16px;"></div>', unsafe_allow_html=True)
 
-        st.markdown('<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:12px 16px;text-align:center;margin-bottom:4px;"><div style="font-size:1.1rem;">🎬</div><div style="font-size:0.55rem;letter-spacing:2px;color:#888;text-transform:uppercase;margin-top:4px;">Generate Vehicle</div></div>', unsafe_allow_html=True)
-        if st.button("GENERATE VEHICLE", key="gen_btn"):
+        if st.button("🎬  GENERATE VEHICLE", key="gen_btn"):
             st.session_state.video_url = None
             with col_vis:
                 url = generate_luma_video(st.session_state.selected_car, paint)
@@ -746,8 +758,9 @@ else:
                     st.session_state.video_url = url
                     st.rerun()
 
-        st.markdown('<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:12px 16px;text-align:center;margin-bottom:4px;margin-top:10px;"><div style="font-size:1.1rem;">←</div><div style="font-size:0.55rem;letter-spacing:2px;color:#888;text-transform:uppercase;margin-top:4px;">Go Back To Configurator</div></div>', unsafe_allow_html=True)
-        if st.button("GO BACK TO CONFIGURATOR", key="back_btn"):
+        st.markdown('<div style="height:8px;"></div>', unsafe_allow_html=True)
+
+        if st.button("←  GO BACK TO CONFIGURATOR", key="back_btn"):
             for k, v in defaults.items():
                 st.session_state[k] = v
             st.rerun()
