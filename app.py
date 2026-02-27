@@ -260,47 +260,55 @@ video { border-radius: 8px; width: 100%; }
 [data-testid="stMetricLabel"] { color: rgba(255,255,255,0.4) !important; font-size: 0.65rem !important; letter-spacing: 2px !important; }
 [data-testid="stMetricValue"] { color: #fff !important; font-size: 1.4rem !important; }
 
-/* Pills — nuclear override, kill all white */
+/* Pills — full reset */
 [data-testid="stPillsContainer"],
 [data-testid="stPillsContainer"] > div,
 [data-testid="stPillsContainer"] > div > div,
 .stPills, .stPills > div, .stPills > div > div {
     background: transparent !important;
-    gap: 8px !important;
 }
+/* Every possible pill button selector */
 button[data-testid="stPill"],
 button[kind="pill"],
-.stPills button {
-    background: rgba(10,10,20,0.75) !important;
-    border: 1px solid rgba(255,255,255,0.2) !important;
-    color: #fff !important;
+.stPills button,
+div[data-testid="stPills"] button {
+    background: rgba(10,10,22,0.85) !important;
+    border: 1px solid rgba(255,255,255,0.25) !important;
+    color: #ffffff !important;
     border-radius: 20px !important;
     font-size: 0.75rem !important;
+    font-weight: 500 !important;
     letter-spacing: 0.5px !important;
     padding: 6px 16px !important;
     transition: all 0.2s !important;
     backdrop-filter: blur(10px) !important;
     box-shadow: none !important;
+    -webkit-text-fill-color: #ffffff !important;
 }
 button[data-testid="stPill"]:hover,
-.stPills button:hover {
-    background: rgba(228,0,43,0.25) !important;
-    border-color: rgba(228,0,43,0.6) !important;
-    color: #fff !important;
+div[data-testid="stPills"] button:hover {
+    background: rgba(228,0,43,0.3) !important;
+    border-color: #E4002B !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
 }
 button[data-testid="stPill"][aria-checked="true"],
 button[data-testid="stPill"][aria-pressed="true"],
-button[data-testid="stPill"][data-active="true"],
-.stPills button[aria-pressed="true"] {
-    background: rgba(228,0,43,0.3) !important;
+div[data-testid="stPills"] button[aria-pressed="true"],
+div[data-testid="stPills"] button[aria-checked="true"] {
+    background: rgba(228,0,43,0.35) !important;
     border-color: #E4002B !important;
-    color: #fff !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
 }
-/* Kill any span/p inside pills that may have white bg */
-button[data-testid="stPill"] *,
-.stPills button * {
+button[data-testid="stPill"] p,
+button[data-testid="stPill"] span,
+button[data-testid="stPill"] div,
+div[data-testid="stPills"] button p,
+div[data-testid="stPills"] button span {
     background: transparent !important;
-    color: #fff !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
 }
 
 /* Pills label */
@@ -384,6 +392,7 @@ defaults = {
     "kai_started": False,
     "preview_image_b64": None,
     "preview_car": None,
+    "car_mentioned": False,
 }
 for k, v in defaults.items():
     if k not in st.session_state:
@@ -603,7 +612,14 @@ if st.session_state.app_state == "CHAT":
         components.html(chat_html, height=520, scrolling=False)
 
         # Input / action buttons
-        if st.session_state.chat_complete:
+        if st.session_state.car_mentioned and not st.session_state.chat_complete:
+            st.markdown('<div style="height:1px;background:rgba(255,255,255,0.06);margin:16px 0 12px;"></div>', unsafe_allow_html=True)
+            st.markdown(f'''<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:12px 16px;text-align:center;margin-bottom:4px;"><div style="font-size:1.1rem;">🚗</div><div style="font-size:0.55rem;letter-spacing:2px;color:#888;text-transform:uppercase;margin-top:4px;">Go to Garage · {st.session_state.selected_car}</div></div>''', unsafe_allow_html=True)
+            if st.button("GO TO GARAGE", key="car_mention_garage"):
+                st.session_state.app_state = "GARAGE"
+                st.rerun()
+
+        elif st.session_state.chat_complete:
             st.markdown('<div style="height:1px;background:rgba(255,255,255,0.06);margin:16px 0 12px;"></div><div style="font-size:0.6rem;letter-spacing:2px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:10px;">NEXT STEP</div>', unsafe_allow_html=True)
             c1, c2 = st.columns(2)
             with c1:
@@ -638,7 +654,7 @@ if st.session_state.app_state == "CHAT":
                             if len(w) > 1 and w.isalpha():
                                 st.session_state.user_name = w.capitalize()
                                 break
-                    st.session_state.app_state = "GARAGE"
+                    st.session_state.car_mentioned = True
                     st.rerun()
                 else:
                     with st.spinner("Kai is typing..."):
@@ -719,25 +735,22 @@ else:
         </div>
         """, unsafe_allow_html=True)
 
-        st.markdown('<div style="height:1px;background:rgba(255,255,255,0.06);margin:20px 0 16px;"></div><div style="font-size:0.6rem;letter-spacing:2px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:10px;">ACTIONS</div>', unsafe_allow_html=True)
+        st.markdown('<div style="height:1px;background:rgba(255,255,255,0.06);margin:20px 0 16px;"></div>', unsafe_allow_html=True)
 
-        col_b1, col_b2 = st.columns(2)
-        with col_b1:
-            st.markdown('<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:12px 16px;text-align:center;"><div style="font-size:1.1rem;">🎬</div><div style="font-size:0.55rem;letter-spacing:2px;color:#888;text-transform:uppercase;margin-top:4px;">Cinematic<br>Reveal</div></div>', unsafe_allow_html=True)
-            if st.button("GENERATE", key="gen_btn"):
-                st.session_state.video_url = None
-                with col_vis:
-                    url = generate_luma_video(st.session_state.selected_car, paint)
-                    if url:
-                        st.session_state.video_url = url
-                        st.rerun()
+        st.markdown('<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:12px 16px;text-align:center;margin-bottom:4px;"><div style="font-size:1.1rem;">🎬</div><div style="font-size:0.55rem;letter-spacing:2px;color:#888;text-transform:uppercase;margin-top:4px;">Generate Vehicle</div></div>', unsafe_allow_html=True)
+        if st.button("GENERATE VEHICLE", key="gen_btn"):
+            st.session_state.video_url = None
+            with col_vis:
+                url = generate_luma_video(st.session_state.selected_car, paint)
+                if url:
+                    st.session_state.video_url = url
+                    st.rerun()
 
-        with col_b2:
-            st.markdown('<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:12px 16px;text-align:center;"><div style="font-size:1.1rem;">←</div><div style="font-size:0.55rem;letter-spacing:2px;color:#888;text-transform:uppercase;margin-top:4px;">Back To<br>Chat</div></div>', unsafe_allow_html=True)
-            if st.button("BACK", key="back_btn"):
-                for k, v in defaults.items():
-                    st.session_state[k] = v
-                st.rerun()
+        st.markdown('<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:12px 16px;text-align:center;margin-bottom:4px;margin-top:10px;"><div style="font-size:1.1rem;">←</div><div style="font-size:0.55rem;letter-spacing:2px;color:#888;text-transform:uppercase;margin-top:4px;">Go Back To Configurator</div></div>', unsafe_allow_html=True)
+        if st.button("GO BACK TO CONFIGURATOR", key="back_btn"):
+            for k, v in defaults.items():
+                st.session_state[k] = v
+            st.rerun()
 
         st.markdown("</div></div>", unsafe_allow_html=True)
 
