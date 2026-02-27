@@ -205,27 +205,42 @@ st.markdown("""
 }
 
 /* Chat input — glassmorphic pill */
-.stChatInput > div {
+/* Chat input — full override */
+.stChatInput { background: transparent !important; }
+.stChatInput > div { background: transparent !important; border: none !important; padding: 0 !important; }
+.stChatInput > div > div { background: transparent !important; }
+
+[data-testid="stChatInput"] { background: transparent !important; }
+[data-testid="stChatInputTextArea"] {
     background: rgba(4,4,12,0.88) !important;
     backdrop-filter: blur(25px) !important;
     -webkit-backdrop-filter: blur(25px) !important;
-    border: 1px solid rgba(255,255,255,0.1) !important;
+    border: 1px solid rgba(255,255,255,0.12) !important;
     border-top: 2px solid rgba(228,0,43,0.4) !important;
     border-radius: 8px !important;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5) !important;
-    padding: 6px 16px !important;
-}
-.stChatInput textarea {
     color: #fff !important;
     font-size: 16px !important;
-    background: transparent !important;
-    letter-spacing: 0.3px !important;
+    padding: 14px 18px !important;
 }
-.stChatInput textarea::placeholder {
-    color: rgba(255,255,255,0.3) !important;
+[data-testid="stChatInput"] * { background: transparent !important; }
+[data-testid="stChatInput"] textarea {
+    background: rgba(4,4,12,0.88) !important;
+    color: #fff !important;
     font-size: 16px !important;
+    border: none !important;
+}
+[data-testid="stChatInput"] textarea::placeholder {
+    color: rgba(255,255,255,0.3) !important;
     letter-spacing: 1px !important;
     text-transform: uppercase !important;
+}
+/* The outer wrapper Streamlit adds */
+.stChatInput > div > div > div {
+    background: rgba(4,4,12,0.88) !important;
+    border: 1px solid rgba(255,255,255,0.12) !important;
+    border-top: 2px solid rgba(228,0,43,0.4) !important;
+    border-radius: 8px !important;
+    backdrop-filter: blur(25px) !important;
 }
 
 /* Garage glass panel */
