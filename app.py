@@ -404,6 +404,7 @@ defaults = {
     "selected_car": "Integra Type S",
     "chat_complete": False,
     "video_url": None,
+    "car_image_b64": None,
     "user_name": "",
     "messages": [],
     "kai_started": False,
@@ -466,8 +467,8 @@ def generate_preview_image(car):
 def generate_still_image(car, color):
     prompt = (
         f"Professional photorealistic automotive studio photograph of a 2026 Acura {car} "
-        f"in {color} paint. Front three-quarter view. Pure black studio background, "
-        f"dramatic cinematic lighting, ultra-realistic, 8k. No text, no people."
+        f"in {color} paint. Front three-quarter view. Very dark navy-black background, "
+        f"dramatic cinematic rim lighting, ultra-realistic, 8k. No text, no people, no floor."
     )
     response = gemini_client.models.generate_content(
         model="gemini-2.5-flash-image",
@@ -478,6 +479,57 @@ def generate_still_image(car, color):
         if part.inline_data is not None:
             return part.inline_data.data, part.inline_data.mime_type
     return None, None
+
+
+def generate_rotating_car(car, color):
+    status_text = st.empty()
+    progress_bar = st.progress(0)
+    try:
+        status_text.markdown("🎬 **Generating cinematic 360° reveal...**")
+        progress_bar.progress(0.15)
+
+        video_prompt = (
+            f"Cinematic 360-degree turntable of a 2026 Acura {car} in {color} paint. "
+            f"The car rotates smoothly on a dark reflective studio floor. "
+            f"Dramatic rim lighting from above, deep black background, "
+            f"luxury automotive advertisement quality, ultra sharp, 4K."
+        )
+
+        operation = gemini_client.models.generate_videos(
+            model="veo-3.1-generate-preview",
+            prompt=video_prompt,
+            config=types.GenerateVideosConfig(
+                aspect_ratio="16:9",
+                number_of_videos=1,
+                duration_seconds=8,
+            )
+        )
+
+        elapsed = 0
+        status_msgs = ["🎨 Composing scene...", "💡 Setting studio lights...", "🚗 Animating your Acura...", "✨ Adding cinematic motion...", "🎬 Finalising..."]
+        while not operation.done:
+            time.sleep(10); elapsed += 10
+            operation = gemini_client.operations.get(operation)
+            progress = min(0.15 + (elapsed / 120) * 0.8, 0.95)
+            idx = min(int((elapsed / 120) * len(status_msgs)), len(status_msgs) - 1)
+            status_text.markdown(f"**{status_msgs[idx]}** *(~{max(0, 120 - elapsed):.0f}s remaining)*")
+            progress_bar.progress(progress)
+            if elapsed > 360:
+                status_text.empty(); progress_bar.empty()
+                st.error("Timed out. Please try again.")
+                return None
+
+        progress_bar.progress(1.0)
+        status_text.empty(); progress_bar.empty()
+
+        video_file = operation.response.generated_videos[0].video
+        video_bytes = gemini_client.files.download(file=video_file)
+        return video_bytes
+
+    except Exception as e:
+        status_text.empty(); progress_bar.empty()
+        st.error(f"Veo 3.1 error: {e}")
+        return None
 
 
 def generate_veo_video(car, color):
@@ -756,11 +808,11 @@ else:
         st.markdown('<div style="height:1px;background:rgba(255,255,255,0.06);margin:20px 0 16px;"></div>', unsafe_allow_html=True)
 
         if st.button("🎬  GENERATE VEHICLE", key="gen_btn"):
-            st.session_state.video_url = None
+            st.session_state.car_image_b64 = None
             with col_vis:
-                video_bytes = generate_veo_video(st.session_state.selected_car, paint)
+                video_bytes = generate_rotating_car(st.session_state.selected_car, paint)
                 if video_bytes:
-                    st.session_state.video_url = video_bytes
+                    st.session_state.car_image_b64 = video_bytes
                     st.rerun()
 
         st.markdown('<div style="height:8px;"></div>', unsafe_allow_html=True)
@@ -773,17 +825,17 @@ else:
         st.markdown("</div></div>", unsafe_allow_html=True)
 
     with col_vis:
-        if st.session_state.video_url:
-            st.video(st.session_state.video_url, autoplay=True, loop=True, muted=True)
-            st.caption(f"2026 Acura {st.session_state.selected_car} · {paint} · Cinematic AI Reveal — Powered by Google Veo 3.1")
+        if st.session_state.car_image_b64:
+            st.video(st.session_state.car_image_b64, autoplay=True, loop=True, muted=True)
+            st.caption(f"2026 Acura {st.session_state.selected_car} · {paint} · 360° Cinematic Reveal — Powered by Google Veo 3.1")
         else:
-            st.markdown("""
+            st.markdown('''
             <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);
                         border-radius:8px;height:460px;display:flex;align-items:center;
                         justify-content:center;flex-direction:column;gap:14px;">
-                <div style="font-size:3rem;opacity:0.2;">🎬</div>
+                <div style="font-size:3rem;opacity:0.2;">\U0001f697</div>
                 <div style="color:rgba(255,255,255,0.2);font-size:0.7rem;letter-spacing:3px;text-align:center;">
-                    SELECT PAINT · CLICK GENERATE<br>
-                    <span style="font-size:0.6rem;opacity:0.6;">Powered by Google Veo 3.1 · ~2 min</span>
+                    SELECT PAINT &middot; CLICK GENERATE<br>
+                    <span style="font-size:0.6rem;opacity:0.6;">Powered by Google Veo 3.1 &middot; ~2 min</span>
                 </div>
-            </div>""", unsafe_allow_html=True)
+            </div>''', unsafe_allow_html=True)
