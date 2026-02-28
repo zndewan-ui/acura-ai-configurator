@@ -517,7 +517,6 @@ def generate_veo_video(car, color):
                 aspect_ratio="16:9",
                 number_of_videos=1,
                 duration_seconds=8,
-                enhance_prompt=True,
             )
         )
 
