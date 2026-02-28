@@ -540,7 +540,9 @@ def generate_veo_video(car, color):
         # Download video and return bytes
         video_path = "/tmp/acura_reveal.mp4"
         video_file = operation.response.generated_videos[0].video
-        gemini_client.files.download(file=video_file, download_path=video_path)
+        video_bytes = gemini_client.files.download(file=video_file)
+        with open(video_path, "wb") as f:
+            f.write(video_bytes)
         with open(video_path, "rb") as f:
             return f.read()
 
