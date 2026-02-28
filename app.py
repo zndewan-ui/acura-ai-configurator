@@ -404,6 +404,7 @@ defaults = {
     "selected_car": "Integra Type S",
     "chat_complete": False,
     "video_url": None,
+    "car_image_b64": None,
     "user_name": "",
     "messages": [],
     "kai_started": False,
@@ -466,8 +467,8 @@ def generate_preview_image(car):
 def generate_still_image(car, color):
     prompt = (
         f"Professional photorealistic automotive studio photograph of a 2026 Acura {car} "
-        f"in {color} paint. Front three-quarter view. Pure black studio background, "
-        f"dramatic cinematic lighting, ultra-realistic, 8k. No text, no people."
+        f"in {color} paint. Front three-quarter view. Very dark navy-black background, "
+        f"dramatic cinematic rim lighting, ultra-realistic, 8k. No text, no people, no floor."
     )
     response = gemini_client.models.generate_content(
         model="gemini-2.5-flash-image",
@@ -478,6 +479,26 @@ def generate_still_image(car, color):
         if part.inline_data is not None:
             return part.inline_data.data, part.inline_data.mime_type
     return None, None
+
+
+def generate_rotating_car(car, color):
+    status_text = st.empty()
+    progress_bar = st.progress(0)
+    try:
+        status_text.markdown("🖼️ **Generating your Acura...**")
+        progress_bar.progress(0.3)
+        image_bytes, mime_type = generate_still_image(car, color)
+        if not image_bytes:
+            st.error("Could not generate image. Please try again.")
+            status_text.empty(); progress_bar.empty()
+            return None
+        progress_bar.progress(1.0)
+        status_text.empty(); progress_bar.empty()
+        return base64.b64encode(image_bytes).decode()
+    except Exception as e:
+        status_text.empty(); progress_bar.empty()
+        st.error(f"Image generation error: {e}")
+        return None
 
 
 def generate_veo_video(car, color):
@@ -756,11 +777,11 @@ else:
         st.markdown('<div style="height:1px;background:rgba(255,255,255,0.06);margin:20px 0 16px;"></div>', unsafe_allow_html=True)
 
         if st.button("🎬  GENERATE VEHICLE", key="gen_btn"):
-            st.session_state.video_url = None
+            st.session_state.car_image_b64 = None
             with col_vis:
-                video_bytes = generate_veo_video(st.session_state.selected_car, paint)
-                if video_bytes:
-                    st.session_state.video_url = video_bytes
+                b64 = generate_rotating_car(st.session_state.selected_car, paint)
+                if b64:
+                    st.session_state.car_image_b64 = b64
                     st.rerun()
 
         st.markdown('<div style="height:8px;"></div>', unsafe_allow_html=True)
@@ -773,17 +794,40 @@ else:
         st.markdown("</div></div>", unsafe_allow_html=True)
 
     with col_vis:
-        if st.session_state.video_url:
-            st.video(st.session_state.video_url, autoplay=True, loop=True, muted=True)
-            st.caption(f"2026 Acura {st.session_state.selected_car} · {paint} · Cinematic AI Reveal — Powered by Google Veo 3.1")
+        if st.session_state.car_image_b64:
+            car_name = st.session_state.selected_car
+            img_src = "data:image/jpeg;base64," + st.session_state.car_image_b64
+            car_html = (
+                "<div style='width:100%;height:480px;display:flex;align-items:center;"
+                "justify-content:center;background:transparent;overflow:hidden;position:relative;'>"
+                "<style>"
+                "@keyframes rotateCar {"
+                "0%   { transform: perspective(900px) rotateY(0deg) scale(1); }"
+                "25%  { transform: perspective(900px) rotateY(90deg) scale(0.82); }"
+                "50%  { transform: perspective(900px) rotateY(180deg) scale(1); }"
+                "75%  { transform: perspective(900px) rotateY(270deg) scale(0.82); }"
+                "100% { transform: perspective(900px) rotateY(360deg) scale(1); }}"
+                ".car-spin { animation: rotateCar 8s linear infinite;"
+                "max-width:95%;max-height:400px;"
+                "filter:drop-shadow(0 20px 60px rgba(0,0,0,0.9)); }"
+                ".lbl { position:absolute;bottom:8px;left:50%;transform:translateX(-50%);"
+                "color:rgba(255,255,255,0.3);font-size:11px;letter-spacing:3px;"
+                "text-transform:uppercase;font-family:Inter,sans-serif;white-space:nowrap; }"
+                "</style>"
+                f"<img class='car-spin' src='{img_src}' />"
+                f"<div class='lbl'>2026 Acura {car_name} &middot; {paint}</div>"
+                "</div>"
+            )
+            import streamlit.components.v1 as components
+            components.html(car_html, height=490, scrolling=False)
         else:
-            st.markdown("""
+            st.markdown('''
             <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);
                         border-radius:8px;height:460px;display:flex;align-items:center;
                         justify-content:center;flex-direction:column;gap:14px;">
-                <div style="font-size:3rem;opacity:0.2;">🎬</div>
+                <div style="font-size:3rem;opacity:0.2;">\U0001f697</div>
                 <div style="color:rgba(255,255,255,0.2);font-size:0.7rem;letter-spacing:3px;text-align:center;">
-                    SELECT PAINT · CLICK GENERATE<br>
-                    <span style="font-size:0.6rem;opacity:0.6;">Powered by Google Veo 3.1 · ~2 min</span>
+                    SELECT PAINT &middot; CLICK GENERATE<br>
+                    <span style="font-size:0.6rem;opacity:0.6;">Powered by Gemini &middot; ~15 seconds</span>
                 </div>
-            </div>""", unsafe_allow_html=True)
+            </div>''', unsafe_allow_html=True)
