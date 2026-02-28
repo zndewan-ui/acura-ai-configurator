@@ -1,7 +1,6 @@
 import streamlit as st
 from google import genai
 from google.genai import types
-from lumaai import LumaAI
 import random
 import time
 import requests
@@ -418,7 +417,6 @@ for k, v in defaults.items():
 
 # --- API CLIENTS ---
 gemini_client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
-luma_client = LumaAI(auth_token=st.secrets["LUMA_API_KEY"])
 
 # --- KAI SYSTEM PROMPT ---
 SYSTEM_PROMPT = f"""You are Kai, a friendly passionate Acura specialist. Warm, casual, enthusiastic, witty — like a car-obsessed friend.
@@ -482,18 +480,7 @@ def generate_still_image(car, color):
     return None, None
 
 
-def upload_image_to_imgbb(image_bytes):
-    b64 = base64.b64encode(image_bytes).decode()
-    response = requests.post(
-        "https://api.imgbb.com/1/upload",
-        data={"key": st.secrets["IMGBB_API_KEY"], "image": b64, "expiration": 600},
-        timeout=30
-    )
-    response.raise_for_status()
-    return response.json()["data"]["url"]
-
-
-def generate_luma_video(car, color):
+def generate_veo_video(car, color):
     status_text = st.empty()
     progress_bar = st.progress(0)
     try:
@@ -505,45 +492,54 @@ def generate_luma_video(car, color):
             status_text.empty(); progress_bar.empty()
             return None
 
-        status_text.markdown("📤 **Uploading reference image...**")
-        progress_bar.progress(0.25)
-        image_url = upload_image_to_imgbb(image_bytes)
+        status_text.markdown("🎬 **Step 2/2 — Submitting to Google Veo 3.1...**")
+        progress_bar.progress(0.3)
 
-        status_text.markdown("🎬 **Step 2/2 — Submitting to Luma AI...**")
-        progress_bar.progress(0.35)
-        generation = luma_client.generations.create(
-            prompt=(
-                f"Cinematic 360-degree turntable reveal of this exact 2026 Acura {car} in {color} paint. "
-                f"Slowly rotates on a black reflective studio floor. Dramatic rim lighting, luxury automotive ad quality."
-            ),
-            model="ray-2", resolution="1080p", duration="5s",
-            keyframes={"frame0": {"type": "image", "url": image_url}}
+        video_prompt = (
+            f"Cinematic 360-degree turntable reveal of a 2026 Acura {car} in {color} paint. "
+            f"The car slowly rotates on a dark reflective luxury showroom floor. "
+            f"Dramatic rim lighting, cinematic automotive advertisement quality, smooth camera motion."
         )
 
-        gen_id = generation.id
+        ref_image = types.Image(image_bytes=image_bytes, mime_type=mime_type or "image/jpeg")
+
+        operation = gemini_client.models.generate_videos(
+            model="veo-3.1-generate-preview",
+            prompt=video_prompt,
+            config=types.GenerateVideosConfig(
+                reference_images=[ref_image],
+                aspect_ratio="16:9",
+                number_of_videos=1,
+                duration_seconds=8,
+            )
+        )
+
         elapsed = 0
-        status_msgs = ["🎨 Composing scene...", "💡 Studio lights...", "🚗 Animating your Acura...", "✨ Cinematic motion...", "🎬 Finalising..."]
-        while elapsed < 300:
-            time.sleep(5); elapsed += 5
-            generation = luma_client.generations.get(id=gen_id)
-            progress = min(0.35 + (elapsed / 90) * 0.6, 0.95)
-            idx = min(int((elapsed / 90) * len(status_msgs)), len(status_msgs) - 1)
-            status_text.markdown(f"**{status_msgs[idx]}** *(~{max(0, 90 - elapsed):.0f}s remaining)*")
+        status_msgs = ["🎨 Composing scene...", "💡 Placing studio lights...", "🚗 Animating your Acura...", "✨ Adding cinematic motion...", "🎬 Finalising..."]
+        while not operation.done:
+            time.sleep(10); elapsed += 10
+            operation = gemini_client.operations.get(operation)
+            progress = min(0.3 + (elapsed / 120) * 0.65, 0.95)
+            idx = min(int((elapsed / 120) * len(status_msgs)), len(status_msgs) - 1)
+            status_text.markdown(f"**{status_msgs[idx]}** *(~{max(0, 120 - elapsed):.0f}s remaining)*")
             progress_bar.progress(progress)
-            if generation.state == "completed":
-                progress_bar.progress(1.0); status_text.empty(); progress_bar.empty()
-                return generation.assets.video
-            elif generation.state == "failed":
+            if elapsed > 360:
                 status_text.empty(); progress_bar.empty()
-                st.error(f"Luma failed: {getattr(generation, 'failure_reason', 'Unknown')}")
+                st.error("Timed out. Please try again.")
                 return None
 
+        progress_bar.progress(1.0)
         status_text.empty(); progress_bar.empty()
-        st.error("Timed out. Please try again.")
-        return None
+
+        generated_video = operation.response.generated_videos[0]
+        gemini_client.files.download(file=generated_video.video)
+        generated_video.video.save("/tmp/acura_reveal.mp4")
+        with open("/tmp/acura_reveal.mp4", "rb") as f:
+            return f.read()
+
     except Exception as e:
         status_text.empty(); progress_bar.empty()
-        st.error(f"Luma AI error: {e}")
+        st.error(f"Veo 3.1 error: {e}")
         return None
 
 
@@ -753,9 +749,9 @@ else:
         if st.button("🎬  GENERATE VEHICLE", key="gen_btn"):
             st.session_state.video_url = None
             with col_vis:
-                url = generate_luma_video(st.session_state.selected_car, paint)
-                if url:
-                    st.session_state.video_url = url
+                video_bytes = generate_veo_video(st.session_state.selected_car, paint)
+                if video_bytes:
+                    st.session_state.video_url = video_bytes
                     st.rerun()
 
         st.markdown('<div style="height:8px;"></div>', unsafe_allow_html=True)
@@ -769,12 +765,8 @@ else:
 
     with col_vis:
         if st.session_state.video_url:
-            try:
-                video_bytes = requests.get(st.session_state.video_url, timeout=30).content
-                st.video(video_bytes, autoplay=True, loop=True, muted=True)
-            except Exception:
-                st.video(st.session_state.video_url)
-            st.caption(f"2026 Acura {st.session_state.selected_car} · {paint} · Cinematic AI Reveal")
+            st.video(st.session_state.video_url, autoplay=True, loop=True, muted=True)
+            st.caption(f"2026 Acura {st.session_state.selected_car} · {paint} · Cinematic AI Reveal — Powered by Google Veo 3.1")
         else:
             st.markdown("""
             <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);
@@ -783,6 +775,6 @@ else:
                 <div style="font-size:3rem;opacity:0.2;">🎬</div>
                 <div style="color:rgba(255,255,255,0.2);font-size:0.7rem;letter-spacing:3px;text-align:center;">
                     SELECT PAINT · CLICK GENERATE<br>
-                    <span style="font-size:0.6rem;opacity:0.6;">Powered by Luma AI · ~90s</span>
+                    <span style="font-size:0.6rem;opacity:0.6;">Powered by Google Veo 3.1 · ~2 min</span>
                 </div>
             </div>""", unsafe_allow_html=True)
