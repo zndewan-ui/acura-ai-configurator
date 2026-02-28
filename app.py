@@ -404,6 +404,7 @@ defaults = {
     "selected_car": "Integra Type S",
     "chat_complete": False,
     "video_url": None,
+    "generating": False,
     "user_name": "",
     "messages": [],
     "kai_started": False,
@@ -484,7 +485,6 @@ def generate_veo_video(car, color):
     status_text = st.empty()
     progress_bar = st.progress(0)
     try:
-        # Step 1: Generate reference image with Gemini
         status_text.markdown("🖼️ **Step 1/2 — Generating reference image...**")
         progress_bar.progress(0.1)
         image_bytes, mime_type = generate_still_image(car, color)
@@ -493,7 +493,6 @@ def generate_veo_video(car, color):
             status_text.empty(); progress_bar.empty()
             return None
 
-        # Step 2: Submit to Veo 3.1 with reference image bytes
         status_text.markdown("🎬 **Step 2/2 — Submitting to Google Veo 3.1...**")
         progress_bar.progress(0.3)
 
@@ -503,11 +502,7 @@ def generate_veo_video(car, color):
             f"Dramatic rim lighting, cinematic automotive advertisement quality, smooth camera motion."
         )
 
-        # Build Image using image_bytes and mime_type directly
-        ref_image = types.Image(
-            image_bytes=image_bytes,
-            mime_type=mime_type or "image/jpeg"
-        )
+        ref_image = types.Image(image_bytes=image_bytes, mime_type=mime_type or "image/jpeg")
 
         operation = gemini_client.models.generate_videos(
             model="veo-3.1-generate-preview",
@@ -537,14 +532,9 @@ def generate_veo_video(car, color):
         progress_bar.progress(1.0)
         status_text.empty(); progress_bar.empty()
 
-        # Download video and return bytes
-        video_path = "/tmp/acura_reveal.mp4"
         video_file = operation.response.generated_videos[0].video
         video_bytes = gemini_client.files.download(file=video_file)
-        with open(video_path, "wb") as f:
-            f.write(video_bytes)
-        with open(video_path, "rb") as f:
-            return f.read()
+        return video_bytes
 
     except Exception as e:
         status_text.empty(); progress_bar.empty()
@@ -757,11 +747,8 @@ else:
 
         if st.button("🎬  GENERATE VEHICLE", key="gen_btn"):
             st.session_state.video_url = None
-            with col_vis:
-                video_bytes = generate_veo_video(st.session_state.selected_car, paint)
-                if video_bytes:
-                    st.session_state.video_url = video_bytes
-                    st.rerun()
+            st.session_state.generating = True
+            st.rerun()
 
         st.markdown('<div style="height:8px;"></div>', unsafe_allow_html=True)
 
@@ -772,10 +759,51 @@ else:
 
         st.markdown("</div></div>", unsafe_allow_html=True)
 
+    # Acura YouTube video IDs for waiting screen
+    ACURA_VIDEOS = [
+        "Qd_nFj3BNHM",  # Acura TLX
+        "UCbZR4pE5Y4",  # Acura MDX
+        "8Xt1gMpTNP0",  # Acura Integra
+        "VUgcNVFwYXk",  # Acura RDX
+        "aXwnFMFJaEY",  # Acura ZDX
+        "3MQF5vqpjAA",  # Acura brand
+        "0mk7aNjBJFQ",  # Acura NSX
+        "IFrRhjVSNbk",  # Acura performance
+    ]
+
     with col_vis:
         if st.session_state.video_url:
+            st.session_state.generating = False
             st.video(st.session_state.video_url, autoplay=True, loop=True, muted=True)
             st.caption(f"2026 Acura {st.session_state.selected_car} · {paint} · Cinematic AI Reveal — Powered by Google Veo 3.1")
+
+        elif st.session_state.generating:
+            # Pick a random Acura YouTube video to play while generating
+            import random as _random
+            yt_id = _random.choice(ACURA_VIDEOS)
+            import streamlit.components.v1 as components
+            components.html(f"""
+                <div style="position:relative;width:100%;padding-bottom:56.25%;border-radius:8px;overflow:hidden;">
+                    <iframe
+                        style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;border-radius:8px;"
+                        src="https://www.youtube.com/embed/{yt_id}?autoplay=1&mute=1&loop=1&playlist={yt_id}&controls=0&showinfo=0&rel=0&modestbranding=1"
+                        allow="autoplay; encrypted-media"
+                        allowfullscreen>
+                    </iframe>
+                </div>
+                <div style="margin-top:10px;color:rgba(255,255,255,0.3);font-size:0.6rem;
+                            letter-spacing:2px;text-transform:uppercase;text-align:center;">
+                    ⚡ Generating your Acura — enjoy some content while you wait
+                </div>
+            """, height=420)
+
+            # Run Veo generation
+            video_bytes = generate_veo_video(st.session_state.selected_car, paint)
+            if video_bytes:
+                st.session_state.video_url = video_bytes
+                st.session_state.generating = False
+                st.rerun()
+
         else:
             st.markdown("""
             <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);
