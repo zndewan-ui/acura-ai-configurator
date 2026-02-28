@@ -493,12 +493,7 @@ def generate_veo_video(car, color):
             status_text.empty(); progress_bar.empty()
             return None
 
-        # Save image locally so types.Image.from_file() can read it
-        img_path = "/tmp/acura_ref.jpg"
-        with open(img_path, "wb") as f:
-            f.write(image_bytes)
-
-        # Step 2: Submit to Veo 3.1 — image passed as top-level arg
+        # Step 2: Submit to Veo 3.1 with reference image bytes
         status_text.markdown("🎬 **Step 2/2 — Submitting to Google Veo 3.1...**")
         progress_bar.progress(0.3)
 
@@ -508,7 +503,11 @@ def generate_veo_video(car, color):
             f"Dramatic rim lighting, cinematic automotive advertisement quality, smooth camera motion."
         )
 
-        ref_image = types.Image.from_file(img_path)
+        # Build Image using image_bytes and mime_type directly
+        ref_image = types.Image(
+            image_bytes=image_bytes,
+            mime_type=mime_type or "image/jpeg"
+        )
 
         operation = gemini_client.models.generate_videos(
             model="veo-3.1-generate-preview",
@@ -518,6 +517,7 @@ def generate_veo_video(car, color):
                 aspect_ratio="16:9",
                 number_of_videos=1,
                 duration_seconds=8,
+                enhance_prompt=True,
             )
         )
 
@@ -538,10 +538,11 @@ def generate_veo_video(car, color):
         progress_bar.progress(1.0)
         status_text.empty(); progress_bar.empty()
 
-        # Return video bytes
-        generated_video = operation.response.generated_videos[0].video
-        generated_video.save("/tmp/acura_reveal.mp4")
-        with open("/tmp/acura_reveal.mp4", "rb") as f:
+        # Download video and return bytes
+        video_path = "/tmp/acura_reveal.mp4"
+        video_file = operation.response.generated_videos[0].video
+        gemini_client.files.download(file=video_file, download_path=video_path)
+        with open(video_path, "rb") as f:
             return f.read()
 
     except Exception as e:
