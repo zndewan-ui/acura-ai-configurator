@@ -483,17 +483,32 @@ def generate_still_image(car, color):
 def generate_veo_video(car, color):
     status_text = st.empty()
     progress_bar = st.progress(0)
+    uploaded_file = None
     try:
-        status_text.markdown("🖼️ **Step 1/2 — Generating reference image...**")
+        # Step 1: Generate reference image
+        status_text.markdown("🖼️ **Step 1/3 — Generating reference image...**")
         progress_bar.progress(0.1)
         image_bytes, mime_type = generate_still_image(car, color)
         if not image_bytes:
             st.error("Could not generate reference image. Please try again.")
             status_text.empty(); progress_bar.empty()
             return None
+        mime_type = mime_type or "image/jpeg"
 
-        status_text.markdown("🎬 **Step 2/2 — Submitting to Google Veo 3.1...**")
-        progress_bar.progress(0.3)
+        # Step 2: Upload image to Google Files API so Veo can reference it by URI
+        status_text.markdown("📤 **Step 2/3 — Uploading reference to Google Files...**")
+        progress_bar.progress(0.2)
+        img_path = "/tmp/acura_ref.jpg"
+        with open(img_path, "wb") as f:
+            f.write(image_bytes)
+        uploaded_file = gemini_client.files.upload(
+            file=img_path,
+            config={"mime_type": mime_type, "display_name": f"acura_{car}_{color}"}
+        )
+
+        # Step 3: Submit to Veo 3.1 using the uploaded file URI
+        status_text.markdown("🎬 **Step 3/3 — Submitting to Google Veo 3.1...**")
+        progress_bar.progress(0.35)
 
         video_prompt = (
             f"Cinematic 360-degree turntable reveal of a 2026 Acura {car} in {color} paint. "
@@ -501,7 +516,10 @@ def generate_veo_video(car, color):
             f"Dramatic rim lighting, cinematic automotive advertisement quality, smooth camera motion."
         )
 
-        ref_image = types.Image(image_bytes=image_bytes, mime_type=mime_type or "image/jpeg")
+        ref_image = types.Image(
+            file_uri=uploaded_file.uri,
+            mime_type=mime_type
+        )
 
         operation = gemini_client.models.generate_videos(
             model="veo-3.1-generate-preview",
@@ -519,7 +537,7 @@ def generate_veo_video(car, color):
         while not operation.done:
             time.sleep(10); elapsed += 10
             operation = gemini_client.operations.get(operation)
-            progress = min(0.3 + (elapsed / 120) * 0.65, 0.95)
+            progress = min(0.35 + (elapsed / 120) * 0.6, 0.95)
             idx = min(int((elapsed / 120) * len(status_msgs)), len(status_msgs) - 1)
             status_text.markdown(f"**{status_msgs[idx]}** *(~{max(0, 120 - elapsed):.0f}s remaining)*")
             progress_bar.progress(progress)
@@ -531,16 +549,22 @@ def generate_veo_video(car, color):
         progress_bar.progress(1.0)
         status_text.empty(); progress_bar.empty()
 
+        # Download video and return bytes
         generated_video = operation.response.generated_videos[0]
-        gemini_client.files.download(file=generated_video.video)
-        generated_video.video.save("/tmp/acura_reveal.mp4")
-        with open("/tmp/acura_reveal.mp4", "rb") as f:
+        video_path = "/tmp/acura_reveal.mp4"
+        gemini_client.files.download(file=generated_video.video, download_path=video_path)
+        with open(video_path, "rb") as f:
             return f.read()
 
     except Exception as e:
         status_text.empty(); progress_bar.empty()
         st.error(f"Veo 3.1 error: {e}")
         return None
+    finally:
+        # Clean up uploaded file from Google Files
+        if uploaded_file:
+            try: gemini_client.files.delete(name=uploaded_file.name)
+            except Exception: pass
 
 
 # ══════════════════════════════════════════════
