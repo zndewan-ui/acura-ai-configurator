@@ -354,47 +354,92 @@ ACURA_MODELS = {
     "Integra": {
         "hp": 200, "torque": 192,
         "traits": "The Daily Driver. Sporty hatchback-sedan with VTEC Turbo and available 6-speed manual.",
-        "colors": ["Urban Gray Pearl", "Apex Blue Pearl", "Platinum White Pearl", "Sonic Gray Pearl", "Performance Red Pearl", "Majestic Black Pearl"]
+        "colors": ["Urban Gray Pearl", "Apex Blue Pearl", "Platinum White Pearl", "Sonic Gray Pearl", "Performance Red Pearl", "Majestic Black Pearl"],
+        "rims": ["18in Dark Chrome Alloy (Stock)", "18in Shark Grey Alloy", "18in Gloss Black Sport", "19in Machined Bronze"],
+        "packages": ["A-Spec Sport Package", "Technology Package", "None"],
+        "interior": ["Ebony Leather", "Ivory Leather", "Red Leather (A-Spec)"],
+        "exhaust": ["Stock", "Acura OEM Sport Exhaust"],
+        "roof": ["Body Colour", "Gloss Black Roof"],
     },
     "Integra Type S": {
         "hp": 320, "torque": 310,
         "traits": "The Purist. Most powerful Integra ever. 6-speed manual, Brembo brakes, 320HP.",
-        "colors": ["Apex Blue Pearl", "Tiger Eye Pearl", "Championship White", "Solar Silver Metallic", "Gotham Gray Pearl"]
+        "colors": ["Apex Blue Pearl", "Tiger Eye Pearl", "Championship White", "Solar Silver Metallic", "Gotham Gray Pearl"],
+        "rims": ["19in Shark Grey Forged (Stock)", "19in Gloss Black Forged", "19in Machined Silver"],
+        "packages": ["Type S Championship White Package", "Carbon Fibre Aero Kit", "None"],
+        "interior": ["Red Leather & Suede", "Black Leather & Suede"],
+        "exhaust": ["Stock Akrapovič Titanium", "Acura OEM Cat-Back Upgrade"],
+        "roof": ["Body Colour", "Gloss Black Roof"],
     },
     "TLX": {
         "hp": 272, "torque": 280,
         "traits": "The Refined Performer. Luxury sports sedan with standard SH-AWD and turbo engine.",
-        "colors": ["Liquid Carbon Metallic", "Platinum White Pearl", "Majestic Black Pearl", "Apex Blue Pearl", "Performance Red Pearl"]
+        "colors": ["Liquid Carbon Metallic", "Platinum White Pearl", "Majestic Black Pearl", "Apex Blue Pearl", "Performance Red Pearl"],
+        "rims": ["19in Shark Grey Alloy (Stock)", "19in Dark Chrome Alloy", "20in Gloss Black Sport"],
+        "packages": ["A-Spec Package", "Technology Package", "Advance Package", "None"],
+        "interior": ["Ebony Leather", "Graystone Leather", "Red Leather (A-Spec)"],
+        "exhaust": ["Stock", "Acura OEM Sport Exhaust"],
+        "roof": ["Body Colour", "Panoramic Moonroof"],
     },
     "TLX Type S": {
         "hp": 355, "torque": 354,
         "traits": "The Executive Athlete. 3.0L Turbo V6, NSX-derived brakes, Brembo calipers.",
-        "colors": ["Urban Gray Pearl", "Apex Blue Pearl", "Majestic Black Pearl", "Liquid Carbon Metallic", "Performance Red Pearl"]
+        "colors": ["Urban Gray Pearl", "Apex Blue Pearl", "Majestic Black Pearl", "Liquid Carbon Metallic", "Performance Red Pearl"],
+        "rims": ["20in Shark Grey Forged (Stock)", "20in Gloss Black Forged", "20in Brushed Titanium"],
+        "packages": ["PMC Edition Package", "Carbon Fibre Aero Kit", "None"],
+        "interior": ["Ebony Leather & Suede", "Red Leather & Suede"],
+        "exhaust": ["Stock", "Acura OEM Type S Sport Exhaust"],
+        "roof": ["Body Colour", "Gloss Black Roof"],
     },
     "ADX": {
         "hp": 190, "torque": 179,
         "traits": "The Urban Adventurer. Compact SUV with Bang & Olufsen sound and city-focused tech.",
-        "colors": ["Urban Gray Pearl", "Double Apex Blue Pearl II", "Platinum White Pearl", "Sonic Gray Pearl", "Majestic Black Pearl"]
+        "colors": ["Urban Gray Pearl", "Double Apex Blue Pearl II", "Platinum White Pearl", "Sonic Gray Pearl", "Majestic Black Pearl"],
+        "rims": ["18in Shark Grey Alloy (Stock)", "18in Gloss Black Alloy", "19in Machine Silver"],
+        "packages": ["A-Spec Package", "Technology Package", "None"],
+        "interior": ["Ebony Leather", "Graystone Leather"],
+        "exhaust": ["Stock"],
+        "roof": ["Body Colour", "Panoramic Moonroof"],
     },
     "RDX A-Spec": {
         "hp": 272, "torque": 280,
         "traits": "The Balanced Versatile. Sport crossover with SH-AWD torque vectoring.",
-        "colors": ["Berlina Black", "Apex Blue Pearl", "Performance Red Pearl", "Liquid Carbon Metallic", "Platinum White Pearl"]
+        "colors": ["Berlina Black", "Apex Blue Pearl", "Performance Red Pearl", "Liquid Carbon Metallic", "Platinum White Pearl"],
+        "rims": ["20in Shark Grey Alloy (Stock)", "20in Gloss Black Sport", "20in Dark Chrome"],
+        "packages": ["A-Spec Advance Package", "Black Edition Package", "None"],
+        "interior": ["Ebony Leather", "Parchment Leather", "Red Leather (A-Spec)"],
+        "exhaust": ["Stock", "Acura OEM Sport Exhaust"],
+        "roof": ["Body Colour", "Panoramic Moonroof"],
     },
     "MDX": {
         "hp": 290, "torque": 267,
         "traits": "The Family Commander. 3-row V6 SUV with racecar DNA and available SH-AWD.",
-        "colors": ["Platinum White Pearl", "Urban Gray Pearl", "Majestic Black Pearl", "Performance Red Pearl", "Apex Blue Pearl"]
+        "colors": ["Platinum White Pearl", "Urban Gray Pearl", "Majestic Black Pearl", "Performance Red Pearl", "Apex Blue Pearl"],
+        "rims": ["20in Shark Grey Alloy (Stock)", "20in Dark Chrome Alloy", "20in Gloss Black"],
+        "packages": ["Technology Package", "Advance Package", "Entertainment Package", "None"],
+        "interior": ["Ebony Leather (7-seat)", "Parchment Leather (7-seat)", "Ebony Leather (6-seat Captain)"],
+        "exhaust": ["Stock"],
+        "roof": ["Body Colour", "Panoramic Moonroof"],
     },
     "MDX Type S": {
         "hp": 355, "torque": 354,
         "traits": "The Power Leader. 7-seat SUV, 3.0L Turbo V6, adaptive air suspension.",
-        "colors": ["Performance Red Pearl", "Urban Gray Pearl", "Majestic Black Pearl", "Apex Blue Pearl", "Platinum White Pearl"]
+        "colors": ["Performance Red Pearl", "Urban Gray Pearl", "Majestic Black Pearl", "Apex Blue Pearl", "Platinum White Pearl"],
+        "rims": ["21in Shark Grey Forged (Stock)", "21in Gloss Black Forged", "21in Brushed Titanium"],
+        "packages": ["Advance Package", "Entertainment Package", "None"],
+        "interior": ["Ebony Leather & Suede", "Parchment Leather"],
+        "exhaust": ["Stock", "Acura OEM Type S Sport Exhaust"],
+        "roof": ["Body Colour", "Panoramic Moonroof"],
     },
     "ZDX Type S": {
         "hp": 500, "torque": 544,
         "traits": "The Electric Vanguard. 500HP, instant torque, zero emissions.",
-        "colors": ["Double Apex Blue Pearl", "Urban Gray Pearl", "Majestic Black Pearl", "Performance Red Pearl"]
+        "colors": ["Double Apex Blue Pearl", "Urban Gray Pearl", "Majestic Black Pearl", "Performance Red Pearl"],
+        "rims": ["22in Gloss Black Forged (Stock)", "22in Shark Grey Forged", "22in Brushed Dark Chrome"],
+        "packages": ["Type S Advance Package", "None"],
+        "interior": ["Ebony Leather", "Orchid Leather"],
+        "exhaust": ["N/A — Electric"],
+        "roof": ["Body Colour", "Panoramic Moonroof"],
     },
 }
 
@@ -496,8 +541,20 @@ def generate_veo_video(car, color):
         status_text.markdown("🎬 **Step 2/2 — Submitting to Google Veo 3.1...**")
         progress_bar.progress(0.3)
 
+        mods = st.session_state
+        rims_sel     = mods.get("rims_select", "")
+        pkg_sel      = mods.get("pkg_select", "None")
+        interior_sel = mods.get("interior_select", "")
+        exhaust_sel  = mods.get("exhaust_select", "")
+        roof_sel     = mods.get("roof_select", "")
+        mod_desc = []
+        if rims_sel:     mod_desc.append(f"{rims_sel} wheels")
+        if pkg_sel and pkg_sel != "None": mod_desc.append(f"{pkg_sel}")
+        if roof_sel and "Black" in roof_sel: mod_desc.append("gloss black roof")
+        mods_str = ", ".join(mod_desc) if mod_desc else "factory spec"
         video_prompt = (
-            f"Cinematic 360-degree turntable reveal of a 2026 Acura {car} in {color} paint. "
+            f"Cinematic 360-degree turntable reveal of a 2026 Acura {car} in {color} paint, "
+            f"fitted with {mods_str}. "
             f"The car slowly rotates on a dark reflective luxury showroom floor. "
             f"Dramatic rim lighting, cinematic automotive advertisement quality, smooth camera motion."
         )
@@ -721,13 +778,21 @@ else:
             <div style="padding:20px;">
         """, unsafe_allow_html=True)
 
-        # Paint selector — dark selectbox
-        colors = ACURA_MODELS[st.session_state.selected_car]["colors"]
-        st.markdown('<div style="font-size:0.6rem;letter-spacing:2px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:6px;">PAINT COLOUR</div>', unsafe_allow_html=True)
-        paint = st.selectbox("", colors, index=0, key="paint_select", label_visibility="collapsed")
+        model_data = ACURA_MODELS[st.session_state.selected_car]
+
+        def mod_select(label, key, options):
+            st.markdown(f'<div style="font-size:0.6rem;letter-spacing:2px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:4px;margin-top:12px;">{label}</div>', unsafe_allow_html=True)
+            return st.selectbox("", options, index=0, key=key, label_visibility="collapsed")
+
+        paint    = mod_select("PAINT COLOUR",  "paint_select",    model_data["colors"])
+        rims     = mod_select("WHEELS",        "rims_select",     model_data["rims"])
+        pkg      = mod_select("PACKAGE",       "pkg_select",      model_data["packages"])
+        interior = mod_select("INTERIOR",      "interior_select", model_data["interior"])
+        exhaust  = mod_select("EXHAUST",       "exhaust_select",  model_data["exhaust"])
+        roof     = mod_select("ROOF",          "roof_select",     model_data["roof"])
 
         # Stats
-        stats = ACURA_MODELS[st.session_state.selected_car]
+        stats = model_data
         st.markdown(f"""
         <div style="display:flex;gap:12px;margin:20px 0;">
             <div style="flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
@@ -769,44 +834,168 @@ else:
             import streamlit.components.v1 as components
             car_name = st.session_state.selected_car
             components.html(f"""
-                <style>
-                @keyframes pulse {{ 0%,100%{{opacity:0.3;transform:scale(1)}} 50%{{opacity:1;transform:scale(1.04)}} }}
-                @keyframes scan {{ 0%{{top:0}} 100%{{top:100%}} }}
-                @keyframes glow {{ 0%,100%{{box-shadow:0 0 20px rgba(228,0,43,0.2)}} 50%{{box-shadow:0 0 60px rgba(228,0,43,0.6)}} }}
-                @keyframes barLoad {{ 0%{{width:0%}} 100%{{width:92%}} }}
-                @keyframes fadeIn {{ from{{opacity:0;transform:translateY(10px)}} to{{opacity:1;transform:translateY(0)}} }}
-                .wrap {{ width:100%;height:420px;display:flex;align-items:center;justify-content:center;
-                         flex-direction:column;gap:28px;background:transparent;font-family:Inter,sans-serif; }}
-                .logo-ring {{ width:110px;height:110px;border-radius:50%;
-                              border:2px solid rgba(228,0,43,0.5);
-                              display:flex;align-items:center;justify-content:center;
-                              animation:glow 2s ease-in-out infinite;position:relative;overflow:hidden; }}
-                .logo-ring::after {{ content:'';position:absolute;left:0;right:0;height:2px;
-                                     background:linear-gradient(90deg,transparent,#E4002B,transparent);
-                                     animation:scan 1.5s linear infinite; }}
-                .logo-a {{ font-size:3rem;font-weight:900;color:#E4002B;animation:pulse 2s ease-in-out infinite; }}
-                .title {{ font-size:0.65rem;letter-spacing:4px;color:rgba(255,255,255,0.5);
-                          text-transform:uppercase;animation:fadeIn 0.8s ease forwards; }}
-                .model {{ font-size:1.1rem;font-weight:700;letter-spacing:3px;color:#fff;
-                          text-transform:uppercase;animation:fadeIn 0.8s 0.2s ease both; }}
-                .bar-wrap {{ width:280px;height:2px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden; }}
-                .bar {{ height:100%;background:linear-gradient(90deg,#E4002B,#ff4060);border-radius:2px;
-                        animation:barLoad 110s linear forwards; }}
-                .sub {{ font-size:0.55rem;letter-spacing:2px;color:rgba(255,255,255,0.25);
-                        text-transform:uppercase;animation:fadeIn 0.8s 0.4s ease both; }}
-                </style>
-                <div class="wrap">
-                    <div class="logo-ring"><span class="logo-a">A</span></div>
-                    <div style="text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center;">
-                        <div class="title">Rendering Your</div>
-                        <div class="model">2026 Acura {car_name}</div>
-                    </div>
-                    <div style="display:flex;flex-direction:column;gap:8px;align-items:center;">
-                        <div class="bar-wrap"><div class="bar"></div></div>
-                        <div class="sub">Powered by Google Veo 3.1 &nbsp;·&nbsp; ~2 min</div>
-                    </div>
-                </div>
-            """, height=430, scrolling=False)
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * {{ margin:0;padding:0;box-sizing:border-box; }}
+  body {{ background:transparent;overflow:hidden; }}
+  canvas {{ display:block; }}
+  .overlay {{
+    position:absolute;top:0;left:0;width:100%;height:100%;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:20px;pointer-events:none;font-family:'Inter',sans-serif;
+  }}
+  @keyframes fadeUp {{ from{{opacity:0;transform:translateY(16px)}} to{{opacity:1;transform:translateY(0)}} }}
+  @keyframes barFill {{ from{{width:0}} to{{width:90%}} }}
+  @keyframes dot {{ 0%,80%,100%{{opacity:0}} 40%{{opacity:1}} }}
+  .car-label {{ font-size:0.6rem;letter-spacing:4px;color:rgba(255,255,255,0.35);text-transform:uppercase;animation:fadeUp 1s ease both; }}
+  .car-name {{ font-size:1.4rem;font-weight:800;letter-spacing:3px;color:#fff;text-transform:uppercase;animation:fadeUp 1s 0.15s ease both; }}
+  .bar-track {{ width:220px;height:1px;background:rgba(255,255,255,0.1);position:relative;overflow:hidden; }}
+  .bar-fill {{ position:absolute;top:0;left:0;height:100%;background:linear-gradient(90deg,#E4002B,#ff6080);animation:barFill 115s linear forwards; }}
+  .status {{ font-size:0.55rem;letter-spacing:3px;color:rgba(228,0,43,0.7);text-transform:uppercase;animation:fadeUp 1s 0.3s ease both; }}
+  .dots span {{ animation:dot 1.4s infinite; }}
+  .dots span:nth-child(2) {{ animation-delay:0.2s; }}
+  .dots span:nth-child(3) {{ animation-delay:0.4s; }}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="overlay">
+  <div>
+    <div class="car-label">Now Rendering</div>
+    <div class="car-name">2026 Acura {car_name}</div>
+  </div>
+  <div class="bar-track"><div class="bar-fill"></div></div>
+  <div class="status">Powered by Veo 3.1 <span class="dots"><span>.</span><span>.</span><span>.</span></span></div>
+</div>
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth || 700;
+canvas.height = 430;
+const W = canvas.width, H = canvas.height;
+const CX = W/2, CY = H/2;
+
+// Particles streaming toward center (speed lines / stars)
+const particles = Array.from({{length:120}}, () => spawnParticle());
+function spawnParticle() {{
+  const angle = Math.random() * Math.PI * 2;
+  const dist = 20 + Math.random() * 60;
+  return {{
+    x: CX + Math.cos(angle) * dist,
+    y: CY + Math.sin(angle) * dist,
+    angle,
+    speed: 0.8 + Math.random() * 3.5,
+    len: 4 + Math.random() * 18,
+    alpha: 0.2 + Math.random() * 0.6,
+    color: Math.random() > 0.85 ? '#E4002B' : '#ffffff',
+    dist
+  }};
+}}
+
+// Acura A SVG path drawn on canvas
+function drawAcuraA(ctx, x, y, size, alpha) {{
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = '#E4002B';
+  ctx.lineWidth = size * 0.06;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  const s = size;
+  // Outer A
+  ctx.beginPath();
+  ctx.moveTo(x, y + s*0.5);
+  ctx.lineTo(x + s*0.5, y - s*0.5);
+  ctx.lineTo(x + s, y + s*0.5);
+  ctx.stroke();
+  // Crossbar
+  ctx.beginPath();
+  ctx.moveTo(x + s*0.22, y + s*0.12);
+  ctx.lineTo(x + s*0.78, y + s*0.12);
+  ctx.stroke();
+  ctx.restore();
+}}
+
+// Rotating ring
+let ringAngle = 0;
+let t = 0;
+
+function draw() {{
+  ctx.clearRect(0, 0, W, H);
+
+  // Deep dark bg
+  const bg = ctx.createRadialGradient(CX, CY, 0, CX, CY, W*0.6);
+  bg.addColorStop(0, 'rgba(8,4,18,0.95)');
+  bg.addColorStop(1, 'rgba(2,2,8,0.98)');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Outer glow ring
+  ctx.save();
+  ctx.translate(CX, CY);
+  ctx.rotate(ringAngle);
+  for (let i = 0; i < 3; i++) {{
+    const r = 140 + i * 28;
+    const grad = ctx.createConicalGradient ? null : null;
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.strokeStyle = i === 0
+      ? `rgba(228,0,43,${{0.12 + 0.08 * Math.sin(t * 0.03)}})` 
+      : `rgba(255,255,255,${{0.03 + 0.02 * Math.sin(t * 0.02 + i)}})`;
+    ctx.lineWidth = i === 0 ? 1.5 : 0.5;
+    ctx.stroke();
+  }}
+  // Spinning arc segment
+  ctx.beginPath();
+  ctx.arc(0, 0, 140, -0.3, 0.8);
+  ctx.strokeStyle = `rgba(228,0,43,${{0.6 + 0.3 * Math.sin(t*0.05)}})`;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.restore();
+
+  // Speed lines shooting outward
+  particles.forEach(p => {{
+    p.dist += p.speed;
+    p.x = CX + Math.cos(p.angle) * p.dist;
+    p.y = CY + Math.sin(p.angle) * p.dist;
+    const x2 = CX + Math.cos(p.angle) * (p.dist - p.len);
+    const y2 = CY + Math.sin(p.angle) * (p.dist - p.len);
+    const fade = Math.min(1, (p.dist - 80) / 60);
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(p.x, p.y);
+    ctx.strokeStyle = p.color;
+    ctx.globalAlpha = p.alpha * fade;
+    ctx.lineWidth = p.color === '#E4002B' ? 1.5 : 0.8;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    if (p.dist > Math.max(W, H)) {{
+      Object.assign(p, spawnParticle());
+    }}
+  }});
+
+  // Central Acura A
+  const pulse = 0.7 + 0.08 * Math.sin(t * 0.04);
+  const aSize = 48 * pulse;
+  drawAcuraA(ctx, CX - aSize/2, CY - aSize/2, aSize, 0.85 + 0.15 * Math.sin(t*0.05));
+
+  // Inner glow behind A
+  const iglow = ctx.createRadialGradient(CX, CY, 0, CX, CY, 80);
+  iglow.addColorStop(0, `rgba(228,0,43,${{0.08 + 0.06 * Math.sin(t*0.04)}})`);
+  iglow.addColorStop(1, 'transparent');
+  ctx.fillStyle = iglow;
+  ctx.fillRect(CX-90, CY-90, 180, 180);
+
+  ringAngle += 0.004;
+  t++;
+  requestAnimationFrame(draw);
+}}
+draw();
+</script>
+</body>
+</html>
+""", height=430, scrolling=False)
 
             # Run Veo generation
             video_bytes = generate_veo_video(st.session_state.selected_car, paint)
