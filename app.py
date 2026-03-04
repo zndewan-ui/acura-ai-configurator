@@ -354,6 +354,7 @@ ACURA_MODELS = {
     "Integra": {
         "hp": 200, "torque": 192,
         "traits": "The Daily Driver. Sporty hatchback-sedan with VTEC Turbo and available 6-speed manual.",
+        "desc": "Engineered to perform and designed to inspire, the Integra brings a new level of sport to every drive. With a 1.5L VTEC Turbo engine, available 6-speed manual transmission, and a driver-focused cockpit — built for those who demand more from their daily.",
         "colors": ["Urban Gray Pearl", "Apex Blue Pearl", "Platinum White Pearl", "Sonic Gray Pearl", "Performance Red Pearl", "Majestic Black Pearl"],
         "rims": ["18in Dark Chrome Alloy (Stock)", "18in Shark Grey Alloy", "18in Gloss Black Sport", "19in Machined Bronze"],
         "packages": ["A-Spec Sport Package", "Technology Package", "None"],
@@ -364,6 +365,7 @@ ACURA_MODELS = {
     "Integra Type S": {
         "hp": 320, "torque": 310,
         "traits": "The Purist. Most powerful Integra ever. 6-speed manual, Brembo brakes, 320HP.",
+        "desc": "The most powerful Integra ever built. The Type S is a purpose-built performance machine with 320 horsepower, a 6-speed limited-slip manual, Brembo front brakes, and an Acura-exclusive adaptive suspension. Track-ready, street-legal, uncompromising.",
         "colors": ["Apex Blue Pearl", "Tiger Eye Pearl", "Championship White", "Solar Silver Metallic", "Gotham Gray Pearl"],
         "rims": ["19in Shark Grey Forged (Stock)", "19in Gloss Black Forged", "19in Machined Silver"],
         "packages": ["Type S Championship White Package", "Carbon Fibre Aero Kit", "None"],
@@ -374,6 +376,7 @@ ACURA_MODELS = {
     "TLX": {
         "hp": 272, "torque": 280,
         "traits": "The Refined Performer. Luxury sports sedan with standard SH-AWD and turbo engine.",
+        "desc": "Sport-luxury redefined. The TLX pairs a 2.0L Turbo engine with standard Super Handling All-Wheel Drive to deliver confident, connected performance. A precision-crafted cabin surrounds you with premium materials and intuitive technology.",
         "colors": ["Liquid Carbon Metallic", "Platinum White Pearl", "Majestic Black Pearl", "Apex Blue Pearl", "Performance Red Pearl"],
         "rims": ["19in Shark Grey Alloy (Stock)", "19in Dark Chrome Alloy", "20in Gloss Black Sport"],
         "packages": ["A-Spec Package", "Technology Package", "Advance Package", "None"],
@@ -384,6 +387,7 @@ ACURA_MODELS = {
     "TLX Type S": {
         "hp": 355, "torque": 354,
         "traits": "The Executive Athlete. 3.0L Turbo V6, NSX-derived brakes, Brembo calipers.",
+        "desc": "The pinnacle of Acura sedan performance. Powered by a 3.0L Turbo V6 derived from NSX development, the TLX Type S delivers 355 horsepower, Brembo Brakes, an adaptive damper system, and Sport+ Mode. Luxury with a heartbeat.",
         "colors": ["Urban Gray Pearl", "Apex Blue Pearl", "Majestic Black Pearl", "Liquid Carbon Metallic", "Performance Red Pearl"],
         "rims": ["20in Shark Grey Forged (Stock)", "20in Gloss Black Forged", "20in Brushed Titanium"],
         "packages": ["PMC Edition Package", "Carbon Fibre Aero Kit", "None"],
@@ -394,6 +398,7 @@ ACURA_MODELS = {
     "ADX": {
         "hp": 190, "torque": 179,
         "traits": "The Urban Adventurer. Compact SUV with Bang & Olufsen sound and city-focused tech.",
+        "desc": "Compact in size, commanding in character. The ADX blends an athletic stance with premium city-ready technology. With Bang & Olufsen sound, panoramic moonroof, and class-leading cargo flexibility, it fits every dimension of your life.",
         "colors": ["Urban Gray Pearl", "Double Apex Blue Pearl II", "Platinum White Pearl", "Sonic Gray Pearl", "Majestic Black Pearl"],
         "rims": ["18in Shark Grey Alloy (Stock)", "18in Gloss Black Alloy", "19in Machine Silver"],
         "packages": ["A-Spec Package", "Technology Package", "None"],
@@ -404,6 +409,7 @@ ACURA_MODELS = {
     "RDX A-Spec": {
         "hp": 272, "torque": 280,
         "traits": "The Balanced Versatile. Sport crossover with SH-AWD torque vectoring.",
+        "desc": "Adventure-ready, sport-tuned. The RDX A-Spec features a 2.0L VTEC Turbo engine, SH-AWD torque vectoring, and bold A-Spec styling. A driver-first interior delivers class-leading technology and versatile space.",
         "colors": ["Berlina Black", "Apex Blue Pearl", "Performance Red Pearl", "Liquid Carbon Metallic", "Platinum White Pearl"],
         "rims": ["20in Shark Grey Alloy (Stock)", "20in Gloss Black Sport", "20in Dark Chrome"],
         "packages": ["A-Spec Advance Package", "Black Edition Package", "None"],
@@ -414,6 +420,7 @@ ACURA_MODELS = {
     "MDX": {
         "hp": 290, "torque": 267,
         "traits": "The Family Commander. 3-row V6 SUV with racecar DNA and available SH-AWD.",
+        "desc": "Three rows. One obsession: performance. The MDX carries the DNA of Acura racing into family hauling. With a 3.5L V6, available SH-AWD, and seating for seven, it redefines what a luxury SUV can be.",
         "colors": ["Platinum White Pearl", "Urban Gray Pearl", "Majestic Black Pearl", "Performance Red Pearl", "Apex Blue Pearl"],
         "rims": ["20in Shark Grey Alloy (Stock)", "20in Dark Chrome Alloy", "20in Gloss Black"],
         "packages": ["Technology Package", "Advance Package", "Entertainment Package", "None"],
@@ -424,6 +431,7 @@ ACURA_MODELS = {
     "MDX Type S": {
         "hp": 355, "torque": 354,
         "traits": "The Power Leader. 7-seat SUV, 3.0L Turbo V6, adaptive air suspension.",
+        "desc": "Power. Prestige. Purpose. The MDX Type S is the most performance-oriented three-row SUV available. A 3.0L Turbo V6 delivers 355 horsepower through SH-AWD, while adaptive air suspension and 21-inch forged wheels complete the statement.",
         "colors": ["Performance Red Pearl", "Urban Gray Pearl", "Majestic Black Pearl", "Apex Blue Pearl", "Platinum White Pearl"],
         "rims": ["21in Shark Grey Forged (Stock)", "21in Gloss Black Forged", "21in Brushed Titanium"],
         "packages": ["Advance Package", "Entertainment Package", "None"],
@@ -434,6 +442,7 @@ ACURA_MODELS = {
     "ZDX Type S": {
         "hp": 500, "torque": 544,
         "traits": "The Electric Vanguard. 500HP, instant torque, zero emissions.",
+        "desc": "The future of Acura performance is electric. The ZDX Type S delivers 500 horsepower and 544 lb-ft of instant torque with zero emissions. An advanced electric SH-AWD system puts that power precisely where it is needed, every moment.",
         "colors": ["Double Apex Blue Pearl", "Urban Gray Pearl", "Majestic Black Pearl", "Performance Red Pearl"],
         "rims": ["22in Gloss Black Forged (Stock)", "22in Shark Grey Forged", "22in Brushed Dark Chrome"],
         "packages": ["Type S Advance Package", "None"],
@@ -807,6 +816,8 @@ else:
             </div>
         </div>
         """, unsafe_allow_html=True)
+
+        st.markdown(f'<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-left:2px solid rgba(228,0,43,0.5);border-radius:4px;padding:12px 14px;margin:4px 0 8px;"><div style="font-size:0.55rem;letter-spacing:2px;color:#E4002B;text-transform:uppercase;margin-bottom:6px;">ABOUT THIS MODEL</div><div style="font-size:0.72rem;line-height:1.6;color:rgba(255,255,255,0.6);">{stats["desc"]}</div></div>', unsafe_allow_html=True)
 
         st.markdown('<div style="height:1px;background:rgba(255,255,255,0.06);margin:20px 0 16px;"></div>', unsafe_allow_html=True)
 
