@@ -817,7 +817,7 @@ else:
         </div>
         """, unsafe_allow_html=True)
 
-        st.markdown(f'<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-left:2px solid rgba(228,0,43,0.5);border-radius:4px;padding:12px 14px;margin:4px 0 8px;"><div style="font-size:0.55rem;letter-spacing:2px;color:#E4002B;text-transform:uppercase;margin-bottom:6px;">ABOUT THIS MODEL</div><div style="font-size:0.72rem;line-height:1.6;color:rgba(255,255,255,0.6);">{stats["desc"]}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-left:2px solid rgba(228,0,43,0.5);border-radius:4px;padding:12px 14px;margin:4px 0 8px;"><div style="font-size:0.55rem;letter-spacing:2px;color:#E4002B;text-transform:uppercase;margin-bottom:6px;">ABOUT THIS MODEL</div><div style="font-size:1rem;line-height:1.75;color:rgba(255,255,255,0.65);">{stats["desc"]}</div></div>', unsafe_allow_html=True)
 
         st.markdown('<div style="height:1px;background:rgba(255,255,255,0.06);margin:20px 0 16px;"></div>', unsafe_allow_html=True)
 
