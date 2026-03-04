@@ -759,18 +759,6 @@ else:
 
         st.markdown("</div></div>", unsafe_allow_html=True)
 
-    # Acura YouTube video IDs for waiting screen
-    ACURA_VIDEOS = [
-        "Qd_nFj3BNHM",  # Acura TLX
-        "UCbZR4pE5Y4",  # Acura MDX
-        "8Xt1gMpTNP0",  # Acura Integra
-        "VUgcNVFwYXk",  # Acura RDX
-        "aXwnFMFJaEY",  # Acura ZDX
-        "3MQF5vqpjAA",  # Acura brand
-        "0mk7aNjBJFQ",  # Acura NSX
-        "IFrRhjVSNbk",  # Acura performance
-    ]
-
     with col_vis:
         if st.session_state.video_url:
             st.session_state.generating = False
@@ -778,24 +766,47 @@ else:
             st.caption(f"2026 Acura {st.session_state.selected_car} · {paint} · Cinematic AI Reveal — Powered by Google Veo 3.1")
 
         elif st.session_state.generating:
-            # Pick a random Acura YouTube video to play while generating
-            import random as _random
-            yt_id = _random.choice(ACURA_VIDEOS)
             import streamlit.components.v1 as components
+            car_name = st.session_state.selected_car
             components.html(f"""
-                <div style="position:relative;width:100%;padding-bottom:56.25%;border-radius:8px;overflow:hidden;">
-                    <iframe
-                        style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;border-radius:8px;"
-                        src="https://www.youtube.com/embed/{yt_id}?autoplay=1&mute=1&loop=1&playlist={yt_id}&controls=0&showinfo=0&rel=0&modestbranding=1"
-                        allow="autoplay; encrypted-media"
-                        allowfullscreen>
-                    </iframe>
+                <style>
+                @keyframes pulse {{ 0%,100%{{opacity:0.3;transform:scale(1)}} 50%{{opacity:1;transform:scale(1.04)}} }}
+                @keyframes scan {{ 0%{{top:0}} 100%{{top:100%}} }}
+                @keyframes glow {{ 0%,100%{{box-shadow:0 0 20px rgba(228,0,43,0.2)}} 50%{{box-shadow:0 0 60px rgba(228,0,43,0.6)}} }}
+                @keyframes barLoad {{ 0%{{width:0%}} 100%{{width:92%}} }}
+                @keyframes fadeIn {{ from{{opacity:0;transform:translateY(10px)}} to{{opacity:1;transform:translateY(0)}} }}
+                .wrap {{ width:100%;height:420px;display:flex;align-items:center;justify-content:center;
+                         flex-direction:column;gap:28px;background:transparent;font-family:Inter,sans-serif; }}
+                .logo-ring {{ width:110px;height:110px;border-radius:50%;
+                              border:2px solid rgba(228,0,43,0.5);
+                              display:flex;align-items:center;justify-content:center;
+                              animation:glow 2s ease-in-out infinite;position:relative;overflow:hidden; }}
+                .logo-ring::after {{ content:'';position:absolute;left:0;right:0;height:2px;
+                                     background:linear-gradient(90deg,transparent,#E4002B,transparent);
+                                     animation:scan 1.5s linear infinite; }}
+                .logo-a {{ font-size:3rem;font-weight:900;color:#E4002B;animation:pulse 2s ease-in-out infinite; }}
+                .title {{ font-size:0.65rem;letter-spacing:4px;color:rgba(255,255,255,0.5);
+                          text-transform:uppercase;animation:fadeIn 0.8s ease forwards; }}
+                .model {{ font-size:1.1rem;font-weight:700;letter-spacing:3px;color:#fff;
+                          text-transform:uppercase;animation:fadeIn 0.8s 0.2s ease both; }}
+                .bar-wrap {{ width:280px;height:2px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden; }}
+                .bar {{ height:100%;background:linear-gradient(90deg,#E4002B,#ff4060);border-radius:2px;
+                        animation:barLoad 110s linear forwards; }}
+                .sub {{ font-size:0.55rem;letter-spacing:2px;color:rgba(255,255,255,0.25);
+                        text-transform:uppercase;animation:fadeIn 0.8s 0.4s ease both; }}
+                </style>
+                <div class="wrap">
+                    <div class="logo-ring"><span class="logo-a">A</span></div>
+                    <div style="text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center;">
+                        <div class="title">Rendering Your</div>
+                        <div class="model">2026 Acura {car_name}</div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:8px;align-items:center;">
+                        <div class="bar-wrap"><div class="bar"></div></div>
+                        <div class="sub">Powered by Google Veo 3.1 &nbsp;·&nbsp; ~2 min</div>
+                    </div>
                 </div>
-                <div style="margin-top:10px;color:rgba(255,255,255,0.3);font-size:0.6rem;
-                            letter-spacing:2px;text-transform:uppercase;text-align:center;">
-                    ⚡ Generating your Acura — enjoy some content while you wait
-                </div>
-            """, height=420)
+            """, height=430, scrolling=False)
 
             # Run Veo generation
             video_bytes = generate_veo_video(st.session_state.selected_car, paint)
