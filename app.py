@@ -459,6 +459,7 @@ defaults = {
     "chat_complete": False,
     "video_url": None,
     "generating": False,
+    "image_model": "gemini-2.5-flash-image",
     "user_name": "",
     "messages": [],
     "kai_started": False,
@@ -518,14 +519,16 @@ def generate_preview_image(car):
     return None
 
 
-def generate_still_image(car, color):
+def generate_still_image(car, color, model=None):
+    if model is None:
+        model = st.session_state.get("image_model", "gemini-2.5-flash-image")
     prompt = (
         f"Professional photorealistic automotive studio photograph of a 2026 Acura {car} "
         f"in {color} paint. Front three-quarter view. Pure black studio background, "
         f"dramatic cinematic lighting, ultra-realistic, 8k. No text, no people."
     )
     response = gemini_client.models.generate_content(
-        model="gemini-2.5-flash-image",
+        model=model,
         contents=prompt,
         config=types.GenerateContentConfig(response_modalities=["IMAGE", "TEXT"])
     )
@@ -788,6 +791,18 @@ else:
         """, unsafe_allow_html=True)
 
         model_data = ACURA_MODELS[st.session_state.selected_car]
+
+        # AI Model selector
+        st.markdown('<div style="font-size:0.6rem;letter-spacing:2px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:4px;">IMAGE MODEL</div>', unsafe_allow_html=True)
+        IMAGE_MODELS = {
+            "Gemini 2.5 Flash (Default)": "gemini-2.5-flash-image",
+            "Gemini 2.0 Flash": "gemini-2.0-flash-preview-image-generation",
+            "Gemini 1.5 Flash": "gemini-1.5-flash",
+        }
+        model_label = st.selectbox("", list(IMAGE_MODELS.keys()), index=0, key="image_model_select", label_visibility="collapsed")
+        st.session_state.image_model = IMAGE_MODELS[model_label]
+
+        st.markdown('<div style="height:1px;background:rgba(255,255,255,0.06);margin:10px 0 4px;"></div>', unsafe_allow_html=True)
 
         def mod_select(label, key, options):
             st.markdown(f'<div style="font-size:0.6rem;letter-spacing:2px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:4px;margin-top:12px;">{label}</div>', unsafe_allow_html=True)
