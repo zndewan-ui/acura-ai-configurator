@@ -493,12 +493,19 @@ Rules:
 
 def get_kai_response(messages):
     formatted = [{"role": "model" if m["role"] == "assistant" else "user", "parts": [{"text": m["content"]}]} for m in messages]
-    response = gemini_client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=formatted,
-        config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT)
-    )
-    return response.text
+    for model in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
+        try:
+            response = gemini_client.models.generate_content(
+                model=model,
+                contents=formatted,
+                config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT)
+            )
+            return response.text
+        except Exception as e:
+            if "503" in str(e) or "UNAVAILABLE" in str(e):
+                continue
+            raise
+    raise Exception("All Gemini models are currently unavailable. Please try again in a moment.")
 
 
 def generate_preview_image(car):
@@ -508,33 +515,44 @@ def generate_preview_image(car):
         f"very dark near-black background with faint depth, cinematic automotive photography. "
         f"No text, no people, no environment details."
     )
-    response = gemini_client.models.generate_content(
-        model="gemini-2.5-flash-image",
-        contents=prompt,
-        config=types.GenerateContentConfig(response_modalities=["IMAGE", "TEXT"])
-    )
-    for part in response.candidates[0].content.parts:
-        if part.inline_data is not None:
-            return base64.b64encode(part.inline_data.data).decode()
+    for m in ["gemini-2.5-flash-image", "gemini-2.0-flash-preview-image-generation"]:
+        try:
+            response = gemini_client.models.generate_content(
+                model=m,
+                contents=prompt,
+                config=types.GenerateContentConfig(response_modalities=["IMAGE", "TEXT"])
+            )
+            for part in response.candidates[0].content.parts:
+                if part.inline_data is not None:
+                    return base64.b64encode(part.inline_data.data).decode()
+        except Exception as e:
+            if "503" in str(e) or "UNAVAILABLE" in str(e):
+                continue
+            raise
     return None
 
-
 def generate_still_image(car, color, model=None):
-    if model is None:
-        model = st.session_state.get("image_model", "gemini-2.5-flash-image")
+    preferred = model or st.session_state.get("image_model", "gemini-2.5-flash-image")
+    fallback_models = [preferred] + [m for m in ["gemini-2.5-flash-image", "gemini-2.0-flash-preview-image-generation"] if m != preferred]
     prompt = (
         f"Professional photorealistic automotive studio photograph of a 2026 Acura {car} "
         f"in {color} paint. Front three-quarter view. Pure black studio background, "
         f"dramatic cinematic lighting, ultra-realistic, 8k. No text, no people."
     )
-    response = gemini_client.models.generate_content(
-        model=model,
-        contents=prompt,
-        config=types.GenerateContentConfig(response_modalities=["IMAGE", "TEXT"])
-    )
-    for part in response.candidates[0].content.parts:
-        if part.inline_data is not None:
-            return part.inline_data.data, part.inline_data.mime_type
+    for m in fallback_models:
+        try:
+            response = gemini_client.models.generate_content(
+                model=m,
+                contents=prompt,
+                config=types.GenerateContentConfig(response_modalities=["IMAGE", "TEXT"])
+            )
+            for part in response.candidates[0].content.parts:
+                if part.inline_data is not None:
+                    return part.inline_data.data, part.inline_data.mime_type
+        except Exception as e:
+            if "503" in str(e) or "UNAVAILABLE" in str(e):
+                continue
+            raise
     return None, None
 
 
